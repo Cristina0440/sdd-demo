@@ -10,7 +10,7 @@ quedan `NEEDS CLARIFICATION` en `plan.md`.
 ### D1. Ventana de detección de duplicados: 10 segundos
 
 - **Decisión**: rechazar como duplicado un registro con el mismo DNI y el
-  mismo texto (tras `trim`) llegado dentro de los 10 segundos desde la
+  mismo texto (tras recortar espacios al inicio y al final) llegado dentro de los 10 segundos desde la
   fecha/hora del mensaje previo; fuera de esa ventana, registrar como nuevo.
 - **Razón**: el usuario fijó explícitamente 10 segundos en la entrada de
   planificación; sustituye a los 60 segundos que asumía el spec, que se
@@ -46,7 +46,7 @@ quedan `NEEDS CLARIFICATION` en `plan.md`.
   (FR-011). La clasificación se calcula una sola vez, al registrar.
 - **Razón**: es lo que exige el spec y es testeable en unit tests puros con
   pytest.
-- **Alternativas consideradas**: clasificador NLP/LLM (coste, respuestas no
+- **Alternativas consideradas**: clasificador NLP/LLM (costo, respuestas no
   deterministas, complejidad innecesaria para listas cortas de palabras clave);
   expresiones regulares libres por usuario (frágiles y difíciles de revisar).
 
@@ -79,7 +79,7 @@ quedan `NEEDS CLARIFICATION` en `plan.md`.
 ### D6. Mapeo de errores: 400 / 409 / 500 con mensajes claros
 
 - **Decisión**: fallo de validación de Pydantic → **400** con el campo y el motivo
-  (DNI ≠ 8 dígitos, teléfono ≠ 9 dígitos, texto vacío, duplicado → **409**);
+  (DNI ≠ 8 dígitos, teléfono que no es celular peruano de 9 dígitos, texto vacío, duplicado → **409**);
   error inesperado → **500** con mensaje genérico y detalle solo en el log
   del servidor (constitución V). Nunca se guarda nada si la validación falla.
 - **Razón**: sigue la constitución y los escenarios de aceptación del spec.
@@ -131,7 +131,8 @@ quedan `NEEDS CLARIFICATION` en `plan.md`.
 - **Decisión**: proyecto gestionado con **uv** (`pyproject.toml` con
   dependencias, scripts y configuración de pytest + `uv.lock` versionado);
   desarrollo con `uv run uvicorn app.main:app --reload` (recarga automática),
-  tests con `uv run pytest`; `pydantic-settings` carga `.env`; comandos
+  tests con `uv run pytest` y análisis estático con `uv run ruff check`
+  (también en CI); `pydantic-settings` carga `.env`; comandos
   documentados en PowerShell en el README (constitución VI).
 - **Razón**: requisito explícito del usuario; uv instala Python y las
   dependencias en un solo paso, con lockfile reproducible en Windows.

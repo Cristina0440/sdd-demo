@@ -24,7 +24,7 @@ README en español con pasos para ejecutar en local en Windows.
 
 **Language/Version**: Python 3.12 o superior (gestionado con uv; compatible con Windows)
 
-**Primary Dependencies**: fastapi (servidor HTTP/ASGI), uvicorn (arranque y recarga en desarrollo), `supabase` (supabase-py, cliente de Supabase), pydantic (validación de entrada), pydantic-settings (carga y validación de `.env`); dev: pytest, httpx (backend del `TestClient` de FastAPI)
+**Primary Dependencies**: fastapi (servidor HTTP/ASGI), uvicorn (arranque y recarga en desarrollo), `supabase` (supabase-py, cliente de Supabase), pydantic (validación de entrada), pydantic-settings (carga y validación de `.env`); dev: pytest, httpx (backend del `TestClient` de FastAPI), ruff (análisis estático)
 
 **Storage**: Supabase (PostgreSQL gestionado) mediante `supabase-py`; una única tabla `mensajes` (DDL en `db/schema.sql`, **se mantiene tal cual** — decisión del usuario); credenciales en `.env` con `.env.example` sin valores reales
 
@@ -36,7 +36,7 @@ README en español con pasos para ejecutar en local en Windows.
 
 **Performance Goals**: consulta de historial en menos de 2 segundos con hasta 10.000 mensajes almacenados (SC-003)
 
-**Constraints**: validación Pydantic en la capa de entrada única (constitución III); credenciales solo en variables de entorno cargadas con pydantic-settings, nunca en el repositorio (constitución IV); códigos HTTP correctos con mensajes claros (constitución V); documentación y comentarios en español (constitución VI); tests exclusivamente con datos ficticios (constitución VII); ventana anti-duplicados de 10 segundos (decisión del usuario); canalización de CI en Python (`uv run pytest`)
+**Constraints**: validación Pydantic en la capa de entrada única (constitución III); credenciales solo en variables de entorno cargadas con pydantic-settings, nunca en el repositorio (constitución IV); códigos HTTP correctos con mensajes claros (constitución V); documentación y comentarios en español (constitución VI); tests exclusivamente con datos ficticios (constitución VII); ventana anti-duplicados de 10 segundos (decisión del usuario); canalización de CI en Python (`uv run ruff check` + `uv run pytest`)
 
 **Scale/Scope**: hasta 10.000 mensajes; 2 endpoints REST; 1 tabla; listas de palabras clave ampliables sin cambiar la lógica de clasificación (FR-014)
 
@@ -111,7 +111,7 @@ tests/
 pyproject.toml + uv.lock     # Proyecto uv: dependencias, scripts y config de pytest
 .env.example                 # Variables sin valores reales
 README.md                    # Instrucciones en español (Windows)
-.github/workflows/ci.yml     # CI: uv + `uv run pytest` en push/PR
+.github/workflows/ci.yml     # CI: uv + `uv run ruff check` + `uv run pytest` en push/PR
 ```
 
 **Structure Decision**: Proyecto único (web-service) — no hay frontend ni móvil:

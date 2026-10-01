@@ -31,11 +31,11 @@ description: "Lista de tareas para la implementación de la feature"
 
 **Propósito**: Retirar el stack Node.js anterior y dejar el proyecto Python listo con uv
 
-- [ ] T001 Eliminar todos los ficheros y carpetas de Node.js — `src/`, `tests/`, `package.json`, `package-lock.json`, `tsconfig.json`, `vitest.config.mts` y `node_modules/` (en PowerShell: `Remove-Item -Recurse -Force`) — conservando intactos `db/schema.sql`, `specs/`, `.specify/`, `.gitignore` y `.env.example`
-- [ ] T002 Crear `pyproject.toml` con el proyecto uv según research D10: `[project]` con Python >=3.12 y dependencias de ejecución `fastapi`, `uvicorn`, `supabase`, `pydantic`, `pydantic-settings`; `[dependency-groups]` de desarrollo con `pytest` y `httpx` (backend del `TestClient`); y `[tool.pytest.ini_options]` con `testpaths = ["tests"]` en `pyproject.toml`
-- [ ] T003 [P] Ejecutar `uv sync` para instalar el entorno `.venv` y generar `uv.lock` (versionar `uv.lock` en el repositorio)
-- [ ] T004 [P] Actualizar `.gitignore` con los patrones de Python/uv (`.venv/`, `__pycache__/`, `*.pyc`, `.pytest_cache/`, `*.egg-info/`), manteniendo `.env` ignorado y `uv.lock` versionado
-- [ ] T005 [P] Verificar que `.env.example` contiene `SUPABASE_URL=` y `SUPABASE_SERVICE_ROLE_KEY=` con valores vacíos (sin secretos reales) y que `.env` figura en `.gitignore`
+- [X] T001 Eliminar todos los ficheros y carpetas de Node.js — `src/`, `tests/`, `package.json`, `package-lock.json`, `tsconfig.json`, `vitest.config.mts` y `node_modules/` (en PowerShell: `Remove-Item -Recurse -Force`) — conservando intactos `db/schema.sql`, `specs/`, `.specify/`, `.gitignore` y `.env.example`
+- [X] T002 Crear `pyproject.toml` con el proyecto uv según research D10: `[project]` con Python >=3.12 y dependencias de ejecución `fastapi`, `uvicorn`, `supabase`, `pydantic`, `pydantic-settings`; `[dependency-groups]` de desarrollo con `pytest`, `httpx` (backend del `TestClient`) y `ruff` (análisis estático); y `[tool.pytest.ini_options]` con `testpaths = ["tests"]` en `pyproject.toml`
+- [X] T003 [P] Ejecutar `uv sync` para instalar el entorno `.venv` y generar `uv.lock` (versionar `uv.lock` en el repositorio)
+- [X] T004 [P] Actualizar `.gitignore` con los patrones de Python/uv (`.venv/`, `__pycache__/`, `*.pyc`, `.pytest_cache/`, `*.egg-info/`), manteniendo `.env` ignorado y `uv.lock` versionado
+- [X] T005 [P] Verificar que `.env.example` contiene `SUPABASE_URL=` y `SUPABASE_SERVICE_ROLE_KEY=` con valores vacíos (sin secretos reales) y que `.env` figura en `.gitignore`
 
 **Punto de control**: `uv sync` instala el proyecto y `uv run pytest` puede invocarse (aún sin tests).
 
@@ -59,7 +59,7 @@ description: "Lista de tareas para la implementación de la feature"
 
 ## Fase 3: Historia de usuario 1 - Registrar un mensaje nuevo con validación (Prioridad: P1)
 
-**Objetivo**: El chatbot envía un mensaje; el servicio valida (`nombre` no vacío, DNI 8 dígitos, teléfono 9 dígitos, texto no vacío), rechaza duplicados dentro de 10 s y guarda con `id`, `fecha_hora` y `clasificacion` (valor temporal `"otro"` hasta que US3 instale el clasificador — FR-009).
+**Objetivo**: El chatbot envía un mensaje; el servicio valida (`nombre` no vacío, DNI 8 dígitos, celular peruano 9 dígitos, texto no vacío), rechaza duplicados dentro de 10 s y guarda con `id`, `fecha_hora` y `clasificacion` (valor temporal `"otro"` hasta que US3 instale el clasificador — FR-009).
 
 > Nota: este incremento es la base técnica; el **MVP funcional (objetivo de negocio) es US1 + US3** — ver *Estrategia de implementación* al final.
 
@@ -71,8 +71,8 @@ description: "Lista de tareas para la implementación de la feature"
 
 - [ ] T011 [P] [US1] Test de contrato: POST `/mensajes` con body válido cuyo texto sea "Hola, buenas tardes" (sin palabras clave, para que la expectativa `clasificacion: "otro"` siga siendo válida tras US3) → `201` con `id`, `fecha_hora`, `clasificacion: "otro"`, usando `TestClient` con el repositorio falso, en `tests/contract/test_mensajes_post.py`
 - [ ] T012 [P] [US1] Test de contrato: POST rechaza `nombre` vacío («no vacío»), `dni` "12345" («exactamente 8 dígitos»), `telefono` "98765432X" («celular peruano de 9 dígitos») y `texto` "   " («no vacío ni solo espacios») con `400` + `campo`, y el repositorio falso NUNCA recibe `insertar`, en `tests/contract/test_mensajes_post_validacion.py`
-- [ ] T013 [P] [US1] Test de contrato: POST idéntico (mismo dni + mismo texto tras `strip()`) dentro de la ventana de 10 segundos → `409`, sin guardar; fuera de la ventana → `201`, en `tests/contract/test_mensajes_post_duplicado.py`
-- [ ] T014 [P] [US1] Test unitario del modelo Pydantic de registro: `«nombre: obligatorio, no vacío (tras strip)»`, `«dni: exactamente 8 dígitos numéricos ^[0-9]{8}$»`, `«telefono: celular peruano, exactamente 9 dígitos numéricos ^9[0-9]{8}$»` tras normalizar, `«texto: no vacío ni solo espacios en blanco»`, en `tests/unit/test_modelo_registro.py`
+- [ ] T013 [P] [US1] Test de contrato: POST idéntico (mismo dni + mismo texto tras recortar espacios al inicio y al final) dentro de la ventana de 10 segundos → `409`, sin guardar; fuera de la ventana → `201`, en `tests/contract/test_mensajes_post_duplicado.py`
+- [ ] T014 [P] [US1] Test unitario del modelo Pydantic de registro: `«nombre: obligatorio, no vacío (tras recortar espacios al inicio y al final)»`, `«dni: exactamente 8 dígitos numéricos ^[0-9]{8}$»`, `«telefono: celular peruano, exactamente 9 dígitos numéricos ^9[0-9]{8}$»` tras normalizar, `«texto: no vacío ni solo espacios en blanco»`, en `tests/unit/test_modelo_registro.py`
 - [ ] T015 [P] [US1] Test unitario de normalización de teléfono: `+51 987 654 321` / `51 987654321` / `987-654-321` → `987654321` válido; `+34 612 345 678`, `+35161234567` y `876543210` (no empieza por 9) → rechazados, en `tests/unit/test_normalizacion_telefono.py`
 
 ### Implementación para la historia de usuario 1
@@ -143,7 +143,7 @@ description: "Lista de tareas para la implementación de la feature"
 
 **Propósito**: Mejoras que afectan a varias historias de usuario
 
-- [ ] T037 [P] Crear el workflow de CI en `.github/workflows/ci.yml` que instala uv (`astral-sh/setup-uv`) y ejecuta `uv run pytest` en cada push y en cada pull request (constitución II: verificación en la canalización de integración)
+- [ ] T037 [P] Crear el workflow de CI en `.github/workflows/ci.yml` que instala uv (`astral-sh/setup-uv`) y ejecuta `uv run ruff check .` y `uv run pytest` en cada push y en cada pull request (constitución II: verificación en la canalización de integración; análisis estático, Estándares de Calidad)
 - [ ] T038 [P] Escribir el `README.md` en español: prerrequisitos (Python 3.12+ y uv), configuración de `.env`, ejecución de `db/schema.sql` en Supabase, `uv run uvicorn app.main:app --reload`, `uv run pytest` y validación manual de los 6 escenarios del quickstart (PowerShell en Windows) en `README.md`
 - [ ] T039 Ejecutar la validación completa de `quickstart.md` (los 6 escenarios, incluida la comprobación manual de rendimiento de SC-003, + `uv run pytest` en verde sin base de datos real) y corregir discrepancias en `specs/001-registrar-mensajes-chatbot/quickstart.md`
 - [ ] T040 Revisión final en `app/`, `tests/`, `README.md` y `db/`: comentarios y docs en español (constitución VI), cero secretos en el repositorio (constitución IV), códigos HTTP correctos (constitución V), todos los tests en verde (constitución II)

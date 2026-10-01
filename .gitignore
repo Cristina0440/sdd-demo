@@ -1,7 +1,13 @@
-# Dependencias
-node_modules/
+# Entorno virtual (uv)
+.venv/
+venv/
 
-# Compilación
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.pytest_cache/
+.ruff_cache/
 dist/
 build/
 
@@ -12,10 +18,6 @@ build/
 
 # Registros
 *.log
-npm-debug.log*
-
-# Cobertura de tests
-coverage/
 
 # Editores y sistema operativo
 .vscode/

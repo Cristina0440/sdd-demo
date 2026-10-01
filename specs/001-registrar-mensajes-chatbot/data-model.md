@@ -10,10 +10,10 @@ persistente del servicio (el alumno se deriva de su DNI — ver más abajo).
 | Campo | Tipo | Obligatorio | Reglas de validación | Origen |
 |-------|------|-------------|----------------------|--------|
 | `id` | uuid | sí | único e irrepetible | lo genera el sistema al registrar (FR-005) |
-| `nombre` | texto | sí | no vacío ni solo espacios (tras `trim`) (FR-017) | lo aporta el chatbot |
+| `nombre` | texto | sí | no vacío ni solo espacios (tras recortar espacios al inicio y al final) (FR-017) | lo aporta el chatbot |
 | `dni` | texto (8 c.) | sí | exactamente 8 dígitos numéricos `^[0-9]{8}$` (FR-002) | lo aporta el chatbot |
 | `telefono` | texto (9 c.) | sí | celular peruano: exactamente 9 dígitos `^9[0-9]{8}$` tras normalizar (FR-003); admite espacios o guiones y prefijo opcional `+51`/`51` | lo aporta el chatbot |
-| `texto` | texto | sí | no vacío ni solo espacios en blanco (FR-004); se compara con `trim` para anti-duplicados | lo aporta el chatbot |
+| `texto` | texto | sí | no vacío ni solo espacios en blanco (FR-004); se compara recortando espacios al inicio y al final para anti-duplicados | lo aporta el chatbot |
 | `fecha_hora` | timestamp con zona | sí | la asigna el sistema en el registro; el emisor no la proporciona | sistema (FR-005) |
 | `clasificacion` | texto | sí | uno de: `informacion_ciclo` \| `devolucion` \| `interes_inscripcion` \| `otro` (FR-009); calculada al registrar y no cambia después | sistema (FR-009, FR-011) |
 
@@ -29,12 +29,12 @@ de la entrada — constitución III):
 
 ### Normalizaciones de entrada (capa de validación con Pydantic)
 
-- `dni`: `trim` → debe ser exactamente 8 dígitos.
-- `telefono`: `trim` → se eliminan espacios y guiones → se elimina el
+- `dni`: recortar espacios al inicio y al final → debe ser exactamente 8 dígitos.
+- `telefono`: recortar espacios al inicio y al final → se eliminan espacios y guiones → se elimina el
   prefijo peruano `+51` o `51` si existe → deben quedar exactamente 9
   dígitos empezando por 9 (celular peruano); cualquier otro código de país
   (incluido `+34`) se rechaza.
-- `texto`: se valida con `trim` (vacío → rechazo) pero se conserva tal cual
+- `texto`: se valida recortando espacios al inicio y al final (vacío → rechazo) pero se conserva tal cual
   como llegó para el historial.
 - Todo dato inválido se rechaza **antes** de persistir nada, con mensaje que
   indica campo y motivo (FR-012).
@@ -42,7 +42,7 @@ de la entrada — constitución III):
 ### Regla de duplicados (10 segundos)
 
 Comprobación previa al insert: existe ya un mensaje con el mismo `dni` y el
-mismo `texto` (tras `trim`) con `fecha_hora > ahora − 10 s` → **409**, no se
+mismo `texto` (tras recortar espacios al inicio y al final) con `fecha_hora > ahora − 10 s` → **409**, no se
 guarda. Fuera de la ventana se registra como mensaje nuevo (FR-016).
 
 ### Retención (fuera de alcance)

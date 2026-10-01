@@ -65,7 +65,7 @@ Registra un mensaje nuevo enviado por el chatbot. Valida, clasifica y guarda.
 (análogo para `telefono` y `texto`; si fallan varios campos, se informa el
 primero en orden: `nombre`, `dni`, `telefono`, `texto`)
 
-**`409 Conflict`** — duplicado: mismo `dni` y mismo `texto` (tras `trim`)
+**`409 Conflict`** — duplicado: mismo `dni` y mismo `texto` (tras recortar espacios al inicio y al final)
 dentro de la ventana de 10 segundos (FR-016), nada guardado:
 
 ```json
@@ -117,7 +117,12 @@ hay mensajes:
 { "campo": "dni", "mensaje": "El DNI debe tener exactamente 8 dígitos" }
 ```
 
-**`500 Internal Server Error`** — como en POST.
+**`500 Internal Server Error`** — fallo inesperado al consultar (p. ej.
+Supabase inalcanzable); el detalle completo solo en el log del servidor:
+
+```json
+{ "mensaje": "Error interno al consultar el historial" }
+```
 
 ---
 

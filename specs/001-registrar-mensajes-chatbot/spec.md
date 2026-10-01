@@ -8,6 +8,12 @@
 
 **Input**: User description: "Construir un servicio que registre los mensajes que los alumnos envían al chatbot de soporte de una academia. Cada mensaje guarda: id, nombre, DNI, teléfono, texto del mensaje y fecha/hora. Se necesita: (1) registrar un mensaje nuevo, rechazando datos inválidos (DNI de 8 dígitos, teléfono de 9 dígitos, mensaje no vacío); (2) consultar el historial de mensajes de un alumno por DNI, ordenado del más reciente al más antiguo; (3) clasificar cada mensaje como 'informacion_ciclo', 'devolucion' u 'otro' según palabras clave, porque las devoluciones deben derivarse a una persona y no las responde el bot. El objetivo es que el equipo de soporte tenga el historial centralizado y que el chatbot pueda consultarlo."
 
+> **Nota (registro histórico)**: redacción original de la petición, conservada
+> verbatim para trazabilidad; sus divergencias con el spec aclarado se
+> resolvieron en Clarifications ("soporte" → "ventas", 3 → 4 categorías con la
+> adición de `interes_inscripcion`, "teléfono de 9 dígitos" → celular peruano).
+> Los requisitos autoritativos son FR-001…FR-017 más abajo.
+
 ## Clarifications
 
 ### Session 2026-10-01
@@ -225,7 +231,7 @@ y el destino (bot o asesor humano) son los esperados.
 
 - **Mensaje**: un mensaje enviado por un alumno al chatbot de ventas.
   Atributos: id único, nombre del alumno (no vacío), DNI (8 dígitos),
-  teléfono (9 dígitos), texto del mensaje (no vacío), fecha/hora de registro y
+  teléfono (celular peruano de 9 dígitos), texto del mensaje (no vacío), fecha/hora de registro y
   clasificación ("informacion_ciclo" | "devolucion" | "interes_inscripcion"
   | "otro").
 - **Alumno** (derivado): se identifica por su DNI; su historial es el
@@ -262,14 +268,19 @@ y el destino (bot o asesor humano) son los esperados.
 
 ## Assumptions
 
-- El DNI se valida por formato: exactamente 8 dígitos numéricos; no se
-  verifica su letra ni se comprueba contra un padrón oficial.
+- El DNI se valida por formato: exactamente 8 dígitos numéricos (el DNI
+  peruano no tiene letra); no se comprueba contra un padrón oficial.
 - El teléfono se valida por formato de celular peruano: exactamente 9
   dígitos numéricos que empiezan por 9; se aceptan espacios o guiones como
   separadores y un prefijo opcional "+51" o "51" que se elimina al
   normalizar; cualquier otro código de país (incluido "+34") se rechaza.
 - La fecha/hora la asigna el sistema en el momento del registro; el
-  emisor no la proporciona.
+  emisor no la proporciona. Se almacena en UTC (`timestamptz`); si
+  alguna vez hay que mostrar hora local peruana, se usa la zona horaria
+  `America/Lima` (UTC−5).
+- Moneda: si un texto menciona una cifra monetaria, la moneda de
+  referencia es el sol peruano (PEN, "S/."); el servicio solo guarda el
+  texto del mensaje, no almacena importes.
 - El id se genera de forma única e irrepetible para cada mensaje; su
   formato no está especificado.
 - La clasificación se calcula una sola vez, al registrar el mensaje, y
