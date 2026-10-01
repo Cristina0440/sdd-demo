@@ -7,6 +7,7 @@ from fastapi import FastAPI
 
 from app.config import obtener_entorno
 from app.errors import instalar_manejadores
+from app.routes.mensajes_ruta import router as router_mensajes
 
 
 def _crear_repositorio_por_defecto():
@@ -44,6 +45,7 @@ def crear_app(repositorio=None) -> FastAPI:
     )
     aplicacion.state.repositorio = repositorio
     instalar_manejadores(aplicacion)
+    aplicacion.include_router(router_mensajes)
     return aplicacion
 
 
