@@ -1,4 +1,4 @@
-# Feature Specification: Registro e Historial de Mensajes del Chatbot de Soporte
+# Feature Specification: Registro e Historial de Mensajes del Chatbot de Ventas
 
 **Feature Branch**: `001-registrar-mensajes-chatbot`
 
@@ -8,11 +8,21 @@
 
 **Input**: User description: "Construir un servicio que registre los mensajes que los alumnos envían al chatbot de soporte de una academia. Cada mensaje guarda: id, nombre, DNI, teléfono, texto del mensaje y fecha/hora. Se necesita: (1) registrar un mensaje nuevo, rechazando datos inválidos (DNI de 8 dígitos, teléfono de 9 dígitos, mensaje no vacío); (2) consultar el historial de mensajes de un alumno por DNI, ordenado del más reciente al más antiguo; (3) clasificar cada mensaje como 'informacion_ciclo', 'devolucion' u 'otro' según palabras clave, porque las devoluciones deben derivarse a una persona y no las responde el bot. El objetivo es que el equipo de soporte tenga el historial centralizado y que el chatbot pueda consultarlo."
 
+## Clarifications
+
+### Session 2026-10-01
+
+- Q: ¿El chatbot es un bot de soporte o un agente de ventas, y quién recibe las derivaciones? → A: Es un agente de ventas de la academia; las categorías "devolucion" e "interes_inscripcion" se escalan a un asesor de ventas humano, y el chatbot solo responde lo que puede resolver ("informacion_ciclo" y "otro").
+- Q: ¿Qué categorías de clasificación existen? → A: Cuatro: "informacion_ciclo", "devolucion", "interes_inscripcion" y "otro".
+- Q: ¿Este servicio deriva activamente los mensajes a una persona o solo clasifica? → A: Solo clasifica; la clasificación es la señal que usa el chatbot para decidir qué mensajes responde él y cuáles se escalan a un asesor de ventas.
+- Q: ¿Qué ocurre si el chatbot reintenta y envía el mismo mensaje dos veces? → A: Se rechaza como duplicado si es idéntico (mismo DNI y mismo texto) y llega dentro de una ventana corta (10 segundos) desde el registro previo; fuera de esa ventana se guarda como mensaje nuevo.
+- Q: ¿Durante cuánto tiempo se conservan los mensajes con datos personales (DNI, teléfono, texto)? → A: Fuera de alcance en esta fase: no se define plazo de conservación; decisión pendiente registrada en Assumptions (se retiró el requisito de 24 meses).
+
 ## User Scenarios & Testing *(mandatory)*
 
 ### User Story 1 - Registrar un mensaje nuevo con validación (Priority: P1)
 
-El chatbot de soporte envía al servicio cada mensaje que un alumno escribe,
+El chatbot de ventas envía al servicio cada mensaje que un alumno escribe,
 junto con su nombre, DNI, teléfono y el texto. El servicio valida los datos
 (ya sea rechazando los inválidos) y guarda el mensaje con un id y la
 fecha/hora del registro.
@@ -41,16 +51,23 @@ un mensaje claro.
 4. **Given** cualquier estado, **When** se registra un mensaje con texto
    vacío o solo espacios, **Then** el sistema lo rechaza con un mensaje
    claro y el mensaje NO se guarda.
+5. **Given** ya existe un mensaje con DNI "12345678" y texto "hola"
+   registrado hace menos de 10 segundos, **When** el chatbot reintenta el
+   envío del mismo DNI y el mismo texto, **Then** el sistema lo rechaza como
+   duplicado con un mensaje claro y NO guarda una copia.
+6. **Given** ya existe un mensaje con DNI "12345678" y texto "hola"
+   registrado hace más de 10 segundos, **When** el alumno vuelve a enviar
+   el mismo texto, **Then** el sistema lo registra como un mensaje nuevo.
 
 ---
 
 ### User Story 2 - Consultar el historial de un alumno por DNI (Priority: P2)
 
-El equipo de soporte (y el propio chatbot) consulta el historial de mensajes
+El equipo de ventas (y el propio chatbot) consulta el historial de mensajes
 de un alumno introduciendo su DNI y obtiene la lista completa de sus
 mensajes, del más reciente al más antiguo.
 
-**Why this priority**: Es el valor principal para el equipo de soporte: ver
+**Why this priority**: Es el valor principal para el equipo de ventas: ver
 el historial centralizado. Depende de que existan mensajes registrados
 (User Story 1), pero puede probarse de forma independiente con datos de
 prueba ficticios.
@@ -77,35 +94,43 @@ mensajes de otros alumnos no aparecen.
 
 ### User Story 3 - Clasificación automática por palabras clave (Priority: P3)
 
-Cada mensaje se clasifica automáticamente al registrarlo como
-"informacion_ciclo", "devolucion" u "otro" según sus palabras clave, para
-que las devoluciones se deriven a una persona del equipo de soporte en lugar
-de responderlas el bot.
+Cada mensaje se clasifica automáticamente al registrarlo en una de cuatro
+categorías: "informacion_ciclo", "devolucion", "interes_inscripcion" u
+"otro". El chatbot usa esta clasificación para decidir qué mensajes responde
+él mismo y cuáles se escalan a un asesor de ventas humano: las devoluciones y el
+interés en inscripción no los responde el bot.
 
-**Why this priority**: Es esencial para el flujo de derivación, pero el
-servicio ya resulta útil sin ella (historial consultable); además depende
-del registro de mensajes.
+**Why this priority**: Sin clasificación el chatbot no puede decidir qué
+resolver y qué derivar; pero el servicio ya resulta útil sin ella
+(historial consultable) y depende del registro de mensajes.
 
 **Independent Test**: Se registran mensajes de prueba ficticios que contienen
 palabras clave de cada categoría y se comprueba que la clasificación asignada
-es la esperada.
+y el destino (bot o asesor humano) son los esperados.
 
 **Acceptance Scenarios**:
 
 1. **Given** cualquier estado, **When** se registra un mensaje cuyo texto
    contiene palabras clave de devolución (p. ej. "devolución", "reembolso",
-   "quiero devolver"), **Then** el mensaje se clasifica como "devolucion".
+   "devolver"), **Then** el mensaje se clasifica como "devolucion" y
+   se destina a un asesor de ventas humano.
 2. **Given** cualquier estado, **When** se registra un mensaje cuyo texto
    contiene palabras clave de información de ciclo (p. ej. "ciclo",
-   "horario", "matrícula") y ninguna de devolución, **Then** el mensaje se
-   clasifica como "informacion_ciclo".
-3. **Given** cualquier estado, **When** se registra un mensaje sin palabras
-   clave de ninguna de las dos primeras categorías, **Then** el mensaje se
-   clasifica como "otro".
-4. **Given** un mensaje contiene palabras clave de devolución y también de
-   información de ciclo, **When** se clasifica, **Then** la categoría es
-   "devolucion" (la devolución tiene prioridad para garantizar la derivación
-   a una persona).
+   "horario", "turno") y ninguna de devolución ni de interés en
+   inscripción, **Then** el mensaje se clasifica como "informacion_ciclo" y
+   lo responde el chatbot.
+3. **Given** cualquier estado, **When** se registra un mensaje cuyo texto
+   contiene palabras clave de interés en inscripción (p. ej. "inscribirme",
+   "matricularme", "separar vacante"), **Then** el mensaje se clasifica como
+   "interes_inscripcion" y se destina a un asesor de ventas humano para que
+   haga seguimiento.
+4. **Given** cualquier estado, **When** se registra un mensaje sin palabras
+   clave de ninguna categoría, **Then** el mensaje se clasifica como "otro"
+   y lo responde el chatbot.
+5. **Given** un mensaje contiene palabras clave de varias categorías,
+   **When** se clasifica, **Then** el orden de prioridad es "devolucion" >
+   "interes_inscripcion" > "informacion_ciclo" > "otro", de modo que toda
+   devolución y todo interés en inscripción llega a una persona.
 
 ---
 
@@ -127,6 +152,14 @@ es la esperada.
 - Registro simultáneo de mensajes → cada mensaje conserva su id único.
 - Un texto que contiene la palabra clave como parte de otra palabra (p. ej.
   "devolucionista") → decisión de coincidencia documentada en Assumptions.
+- Un mensaje contiene palabras clave de información de ciclo y también de
+  interés en inscripción (p. ej. "quiero información del ciclo para
+  inscribirme") → se clasifica como "interes_inscripcion": ante la duda, el
+  seguimiento humano tiene prioridad sobre la respuesta automática.
+- Reintento del chatbot: el mismo DNI y el mismo texto dentro de los 10
+  segundos → rechazado como duplicado; el mismo texto pasado ese tiempo, o
+  con un texto distinto, → se registra como mensaje nuevo (un alumno puede
+  escribir "hola" legítimamente varias veces).
 
 ## Requirements *(mandatory)*
 
@@ -151,30 +184,46 @@ es la esperada.
   coincide con el consultado; si no hay mensajes, MUST devolver una lista
   vacía sin error.
 - **FR-009**: El sistema MUST clasificar cada mensaje registrado en una de
-  tres categorías exactas: "informacion_ciclo", "devolucion" u "otro".
+  cuatro categorías exactas: "informacion_ciclo", "devolucion",
+  "interes_inscripcion" u "otro".
 - **FR-010**: La clasificación MUST basarse en una lista de palabras clave
   por categoría, distingiendo mayúsculas/minúsculas y acentos de forma
   tolerante.
 - **FR-011**: Cuando un mensaje contiene palabras clave de varias
-  categorías, "devolucion" MUST tener prioridad sobre "informacion_ciclo",
-  y esta sobre "otro", para garantizar que toda devolución llega a una
-  persona.
+  categorías, la prioridad MUST ser "devolucion" > "interes_inscripcion" >
+  "informacion_ciclo" > "otro", para garantizar que toda devolución y todo
+  interés en inscripción llegue a una persona.
 - **FR-012**: El sistema MUST rechazar los datos inválidos con mensajes de
   error claros que indiquen qué campo es inválido y por qué, sin guardar
   nada.
 - **FR-013**: Todo mensaje registrado MUST conservarse con su clasificación
-  para que el chatbot y el equipo de soporte puedan consultarlo
+  para que el chatbot y el equipo de ventas puedan consultarlo
   posteriormente.
 - **FR-014**: Las palabras clave de clasificación MUST poder ampliarse sin
   cambiar la lógica de clasificación (p. ej. añadir sinónimos de
   devolución).
+- **FR-015**: La clasificación MUST determinar el destino del mensaje: los
+  mensajes "devolucion" e "interes_inscripcion" MUST quedar marcados para
+  derivación a un asesor de ventas humano, y los mensajes "informacion_ciclo"
+  y "otro" para respuesta del chatbot. La marca es el propio campo
+  `clasificacion`; no se requiere un indicador adicional. El comportamiento
+  del chatbot (responder o no cada mensaje) está fuera del alcance de este
+  servicio.
+- **FR-016**: El sistema MUST rechazar como duplicado todo mensaje con el
+  mismo DNI y el mismo texto (ignorando espacios al inicio y al final) que
+  uno ya registrado en los últimos 10 segundos, indicando el motivo y sin
+  guardar nada; fuera de esa ventana MUST registrarse como mensaje nuevo.
+- **FR-017**: El sistema MUST rechazar todo mensaje cuyo nombre esté vacío
+  o contenga solo espacios en blanco, indicando el motivo en el mensaje de
+  error.
 
 ### Key Entities *(include if feature involves data)*
 
-- **Mensaje**: un mensaje enviado por un alumno al chatbot de soporte.
-  Atributos: id único, nombre del alumno, DNI (8 dígitos), teléfono
-  (9 dígitos), texto del mensaje (no vacío), fecha/hora de registro y
-  clasificación ("informacion_ciclo" | "devolucion" | "otro").
+- **Mensaje**: un mensaje enviado por un alumno al chatbot de ventas.
+  Atributos: id único, nombre del alumno (no vacío), DNI (8 dígitos),
+  teléfono (9 dígitos), texto del mensaje (no vacío), fecha/hora de registro y
+  clasificación ("informacion_ciclo" | "devolucion" | "interes_inscripcion"
+  | "otro").
 - **Alumno** (derivado): se identifica por su DNI; su historial es el
   conjunto de mensajes con ese DNI, ordenado por fecha/hora de registro.
 
@@ -191,12 +240,21 @@ es la esperada.
   correctamente sus mensajes en menos de 2 segundos con hasta 10.000
   mensajes almacenados.
 - **SC-004**: El 100% de los mensajes de prueba que contienen palabras clave
-  de devolución se clasifican como "devolucion", incluidos los que también
-  contienen palabras de otras categorías.
-- **SC-005**: El equipo de soporte localiza un mensaje concreto de un alumno
+  de devolución se clasifican como "devolucion", y el 100% de los que
+  contienen palabras clave de interés en inscripción se clasifican como
+  "interes_inscripcion", incluidos los que también contienen palabras de
+  otras categorías.
+- **SC-005**: El equipo de ventas localiza un mensaje concreto de un alumno
   en su historial en menos de 30 segundos desde que abre la consulta.
 - **SC-006**: Cero mensajes con datos personales reales se usan en las
   pruebas automatizadas (solo datos ficticios).
+- **SC-007**: El 100% de los mensajes clasificados como "devolucion" o
+  "interes_inscripcion" quedan marcados para derivación a un asesor de
+  ventas humano. Verificar que el chatbot no los responde queda fuera del
+  alcance de este servicio (responsabilidad del chatbot).
+- **SC-008**: En las pruebas, el 100% de los reenvíos idénticos dentro de
+  la ventana de 10 segundos se rechazan (cero duplicados almacenados) y el
+  100% de las repeticiones legítimas fuera de la ventana se registran.
 
 ## Assumptions
 
@@ -211,18 +269,29 @@ es la esperada.
   formato no está especificado.
 - La clasificación se calcula una sola vez, al registrar el mensaje, y
   queda almacenada junto a él.
-- La lista inicial de palabras clave es un conjunto de partida que
-  ampliará el equipo de soporte; no se especifica aquí el listado
-  definitivo (las palabras clave de ejemplo en los escenarios son solo
-  ilustrativas).
+- Las listas iniciales de palabras clave están definidas en el Apéndice A
+  de data-model.md (con ejemplos en español peruano); el equipo de ventas
+  podrá ampliarlas sin cambiar la lógica de clasificación (FR-014). La
+  palabra "cancelar" queda deliberadamente fuera de las listas (en el
+  Perú significa "pagar", no "anular").
+- El destino por clasificación: "devolucion" e "interes_inscripcion" se
+  escalan a un asesor de ventas humano; "informacion_ciclo" y "otro" los
+  resuelve el chatbot. El mecanismo concreto por el que la derivación
+  llega al asesor (notificación, cola, etc.) forma parte del chatbot, no
+  de este servicio, que solo expone la clasificación.
 - Coincidencia de palabras clave por palabra completa (no por subcadena),
   para evitar falsos positivos como "devolucionista" → "devolucion".
 - Sin palabras clave aplicables, la categoría por defecto es "otro".
-- El servicio es de uso interno (chatbot y equipo de soporte); los
+- La ventana anti-duplicados son 10 segundos contados desde la fecha/hora
+  de registro del mensaje previo; la comparación de texto ignora espacios
+  al inicio y al final pero no reformulatea el mensaje.
+- El servicio es de uso interno (chatbot de ventas y equipo de ventas); los
   mecanismos de acceso y autenticación no se especifican en esta fase y se
   definirán en la planificación.
-- No se ha definido un periodo de retención de mensajes: se conservan de
-  forma indefinida hasta que se establezca una política.
+- **(Decisión pendiente)** La retención de datos se declaró fuera de
+  alcance en esta fase: no se define plazo de conservación de mensajes y no
+  se ejecuta ninguna purga; deberá fijarse una política antes de usar datos
+  personales reales.
 - El objetivo de volumen asumido es de hasta 10.000 mensajes almacenados
   sin degradación perceptible; volúmenes mayores se evaluarán después.
 - Todas las pruebas se escribirán con datos ficticios, conforme a la
