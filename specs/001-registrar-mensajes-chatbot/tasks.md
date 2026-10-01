@@ -97,17 +97,17 @@ description: "Lista de tareas para la implementación de la feature"
 
 > **NOTA: Escribir estos tests PRIMERO y verificar que FALLAN antes de implementar**
 
-- [ ] T021 [P] [US2] Test de contrato: POST `/mensajes/consulta` con dni válido en el cuerpo → `200` con lista ordenada por `fecha_hora` descendente y sin mensajes de otros DNIs, en `tests/contract/test_mensajes_consulta.py`
-- [ ] T022 [P] [US2] Test de contrato: POST `/mensajes/consulta` sin `dni` o con `dni` ≠ 8 dígitos → `400` con `campo: "dni"`; dni sin mensajes → `200` con `[]`, en `tests/contract/test_mensajes_consulta_validacion.py`
-- [ ] T023 [P] [US2] Test unitario del orden estable: dos mensajes con la misma `fecha_hora` se devuelven siempre en el mismo orden y sin pérdidas, en `tests/unit/test_orden_historial.py`
+- [X] T021 [P] [US2] Test de contrato: POST `/mensajes/consulta` con dni válido en el cuerpo → `200` con lista ordenada por `fecha_hora` descendente y sin mensajes de otros DNIs, en `tests/contract/test_mensajes_consulta.py`
+- [X] T022 [P] [US2] Test de contrato: POST `/mensajes/consulta` sin `dni` o con `dni` ≠ 8 dígitos → `400` con `campo: "dni"`; dni sin mensajes → `200` con `[]`, en `tests/contract/test_mensajes_consulta_validacion.py`
+- [X] T023 [P] [US2] Test unitario del orden estable: dos mensajes con la misma `fecha_hora` se devuelven siempre en el mismo orden y sin pérdidas, en `tests/unit/test_orden_historial.py`
 
 ### Implementación para la historia de usuario 2
 
-- [ ] T024 [US2] Añadir el modelo de cuerpo de consulta `ConsultaHistorial` con `dni: «exactamente 8 dígitos numéricos ^[0-9]{8}$»` (falta o inválido → `400`, no `422`) en `app/validation.py`
-- [ ] T025 [US2] Añadir `consultar_por_dni(dni)` con la consulta «WHERE dni = … ORDER BY fecha_hora DESC, id DESC» (FR-007/008) a la implementación `supabase-py`, y ampliar el repositorio falso de `tests/support/repositorio_falso.py` con el mismo método, en `app/repositories/mensajes_repositorio.py`
-- [ ] T026 [US2] Añadir `historial(dni)` en el servicio, devolviendo `[]` (sin error) cuando no hay mensajes, en `app/services/mensajes_servicio.py`
-- [ ] T027 [US2] Implementar la ruta `POST /mensajes/consulta` en `app/routes/mensajes_ruta.py`
-- [ ] T028 [US2] Test de integración: registrar 3 mensajes con repositorio falso → historial ordenado del más reciente al más antiguo, sin mensajes de otros DNIs, en `tests/integration/test_historial_mensajes.py`
+- [X] T024 [US2] Añadir el modelo de cuerpo de consulta `ConsultaHistorial` con `dni: «exactamente 8 dígitos numéricos ^[0-9]{8}$»` (falta o inválido → `400`, no `422`) en `app/validation.py`
+- [X] T025 [US2] Añadir `consultar_por_dni(dni)` con la consulta «WHERE dni = … ORDER BY fecha_hora DESC, id DESC» (FR-007/008) a la implementación `supabase-py`, y ampliar el repositorio falso de `tests/support/repositorio_falso.py` con el mismo método, en `app/repositories/mensajes_repositorio.py`
+- [X] T026 [US2] Añadir `historial(dni)` en el servicio, devolviendo `[]` (sin error) cuando no hay mensajes, en `app/services/mensajes_servicio.py`
+- [X] T027 [US2] Implementar la ruta `POST /mensajes/consulta` en `app/routes/mensajes_ruta.py`
+- [X] T028 [US2] Test de integración: registrar 3 mensajes con repositorio falso → historial ordenado del más reciente al más antiguo, sin mensajes de otros DNIs, en `tests/integration/test_historial_mensajes.py`
 
 **Punto de control**: En este punto las historias de usuario 1 y 2 deben funcionar de forma independiente.
 
@@ -143,10 +143,10 @@ description: "Lista de tareas para la implementación de la feature"
 
 **Propósito**: Mejoras que afectan a varias historias de usuario
 
-- [ ] T037 [P] Crear el workflow de CI en `.github/workflows/ci.yml` que instala uv (`astral-sh/setup-uv`) y ejecuta `uv run ruff check .` y `uv run pytest` en cada push y en cada pull request (constitución II: verificación en la canalización de integración; análisis estático, Estándares de Calidad)
-- [ ] T038 [P] Escribir el `README.md` en español: prerrequisitos (Python 3.12+ y uv), configuración de `.env`, ejecución de `db/schema.sql` en Supabase, `uv run uvicorn app.main:app --reload`, `uv run pytest` y validación manual de los 6 escenarios del quickstart (PowerShell en Windows) en `README.md`
-- [ ] T039 Ejecutar la validación completa de `quickstart.md` (los 6 escenarios, incluida la comprobación manual de rendimiento de SC-003, + `uv run pytest` en verde sin base de datos real) y corregir discrepancias en `specs/001-registrar-mensajes-chatbot/quickstart.md`
-- [ ] T040 Revisión final en `app/`, `tests/`, `README.md` y `db/`: comentarios y docs en español (constitución VI), cero secretos en el repositorio (constitución IV), códigos HTTP correctos (constitución V), todos los tests en verde (constitución II) y logs sin datos personales (constitución VIII)
+- [X] T037 [P] Crear el workflow de CI en `.github/workflows/ci.yml` que instala uv (`astral-sh/setup-uv`) y ejecuta `uv run ruff check .` y `uv run pytest` en cada push y en cada pull request (constitución II: verificación en la canalización de integración; análisis estático, Estándares de Calidad)
+- [X] T038 [P] Escribir el `README.md` en español: prerrequisitos (Python 3.12+ y uv), configuración de `.env`, ejecución de `db/schema.sql` en Supabase, `uv run uvicorn app.main:app --reload`, `uv run pytest` y validación manual de los 6 escenarios del quickstart (PowerShell en Windows) en `README.md`
+- [X] T039 Ejecutar la validación completa de `quickstart.md` (los 6 escenarios, incluida la comprobación manual de rendimiento de SC-003, + `uv run pytest` en verde sin base de datos real) y corregir discrepancias en `specs/001-registrar-mensajes-chatbot/quickstart.md`
+- [X] T040 Revisión final en `app/`, `tests/`, `README.md` y `db/`: comentarios y docs en español (constitución VI), cero secretos en el repositorio (constitución IV), códigos HTTP correctos (constitución V), todos los tests en verde (constitución II) y logs sin datos personales (constitución VIII)
 - [X] T041 [P] Logs sin datos personales (constitución VIII): en validación y errores registrar únicamente campo, tipo de error y endpoint, nunca el valor enviado (DNI, teléfono, nombre ni texto), mediante `registrar_error_interno` (traza sin mensaje de excepción) en `app/errors.py` y `app/routes/mensajes_ruta.py`; cubierto por `tests/contract/test_logs_sin_datos_personales.py`
 
 ---

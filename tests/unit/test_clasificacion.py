@@ -17,6 +17,10 @@ from app.classification.palabras_clave import clasificar
         ("Vengo a separar vacante", "interes_inscripcion"),
         ("Gracias, ya lo sé", "otro"),
         ("Hola, buenas tardes", "otro"),
+        ("¿Hacen devoluciones?", "devolucion"),
+        ("¿Hasta cuándo son las inscripciones?", "interes_inscripcion"),
+        ("¿Hasta cuándo es la matriculación?", "interes_inscripcion"),
+        ("¿Quedan vacantes?", "interes_inscripcion"),
     ],
 )
 def test_clasifica_por_categoria(texto: str, esperado: str) -> None:

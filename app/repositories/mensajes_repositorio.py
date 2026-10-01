@@ -6,6 +6,17 @@ from typing import Protocol
 from supabase import Client, create_client
 
 
+def _como_fecha(valor: str | datetime) -> datetime:
+    """Interpreta una `fecha_hora` ISO8601 en UTC (admite el sufijo `Z`)."""
+    if isinstance(valor, datetime):
+        momento = valor
+    else:
+        momento = datetime.fromisoformat(str(valor))
+    if momento.tzinfo is None:
+        return momento.replace(tzinfo=UTC)
+    return momento
+
+
 class RepositorioMensajes(Protocol):
     """Interfaz común: el servicio solo conoce estos métodos (el tests usa el doble)."""
 
@@ -15,6 +26,11 @@ class RepositorioMensajes(Protocol):
 
     def buscar_reciente(self, dni: str, texto: str, ventana_segundos: int) -> dict | None:
         """Mensaje idéntico (mismo DNI y mismo texto recortado) dentro de la ventana."""
+        ...
+
+    def consultar_por_dni(self, dni: str) -> list[dict]:
+        """Todos los mensajes del DNI: fecha_hora DESC con desempate id DESC,
+        vacío si no hay mensajes (FR-007/008)."""
         ...
 
 
@@ -48,3 +64,20 @@ class RepositorioMensajesSupabase:
             if str(fila["texto"]).strip() == texto.strip():
                 return fila
         return None
+
+    def consultar_por_dni(self, dni: str) -> list[dict]:
+        respuesta = (
+            self._cliente.table("mensajes")
+            .select("*")
+            .eq("dni", dni)
+            .order("fecha_hora", desc=True)
+            .execute()
+        )
+        # Orden por fecha_hora DESC y desempate por id DESC, reordenado en
+        # Python para que el desempate sea estable e idéntico al repositorio
+        # falso (`_como_fecha` parsea el ISO8601 que devuelve PostgREST)
+        return sorted(
+            respuesta.data,
+            key=lambda fila: (_como_fecha(fila["fecha_hora"]), str(fila["id"])),
+            reverse=True,
+        )

@@ -55,3 +55,14 @@ class RepositorioFalso:
             if coincide_dni and coincide_texto and dentro_de_ventana:
                 return dict(mensaje)
         return None
+
+    def consultar_por_dni(self, dni: str) -> list[dict]:
+        """Todos los mensajes del DNI: fecha_hora DESC con desempate id DESC
+        (orden estable), igual que el repositorio real (FR-007/008)."""
+        del_alumno = [m for m in self.mensajes if m["dni"] == dni]
+        ordenados = sorted(
+            del_alumno,
+            key=lambda m: (_como_datetime(m["fecha_hora"]), str(m["id"])),
+            reverse=True,
+        )
+        return [dict(m) for m in ordenados]

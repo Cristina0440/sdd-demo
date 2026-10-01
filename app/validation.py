@@ -60,3 +60,17 @@ class MensajeRegistro(BaseModel):
             raise ValueError("El texto no puede estar vacío ni solo espacios en blanco")
         # Se valida recortando pero se conserva tal cual (data-model)
         return valor
+
+
+class ConsultaHistorial(BaseModel):
+    """Cuerpo de `POST /mensajes/consulta`: el DNI a consultar (FR-006)."""
+
+    dni: str
+
+    @field_validator("dni")
+    @classmethod
+    def _dni_ocho_digitos(cls, valor: str) -> str:
+        recortado = valor.strip()
+        if re.fullmatch(r"[0-9]{8}", recortado) is None:
+            raise ValueError("El DNI debe tener exactamente 8 dígitos")
+        return recortado

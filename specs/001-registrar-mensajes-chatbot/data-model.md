@@ -82,8 +82,8 @@ en minúsculas y sin acentos (research D3). Prioridad ante texto mixto:
 
 | Categoría | Palabras clave iniciales |
 |-----------|--------------------------|
-| `devolucion` | devolución, devolver, devuelvan, reembolso, reembolsar, anular matrícula, retirarme, me quiero retirar |
-| `interes_inscripcion` | matrícula, matricular, matricularme, quiero matricularme, inscribir, inscribirme, inscripción, separar vacante, separar mi vacante, vacante, cómo me inscribo, quiero inscribirme |
+| `devolucion` | devolución, devolver, devuelvan, devoluciones, reembolso, reembolsos, reembolsar, anular matrícula, retirarme, me quiero retirar |
+| `interes_inscripcion` | matrícula, matriculas, matrículas, matriculación, matricular, matricularme, quiero matricularme, inscribir, inscribirme, inscripción, inscripciones, separar vacante, separar mi vacante, vacante, vacantes, cómo me inscribo, quiero inscribirme |
 | `informacion_ciclo` | ciclo, ciclos, horario, horarios, turno, turnos, fecha de inicio, cuándo empieza, cursos, modalidad, virtual, presencial, precio, costo, cuánto cuesta, mensualidad, simulacro |
 | `otro` | sin palabras clave (categoría por defecto cuando no hay coincidencia) |
 

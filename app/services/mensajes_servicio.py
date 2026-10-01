@@ -45,3 +45,7 @@ class ServicioMensajes:
             "clasificacion": clasificar(entrada.texto),
         }
         return self._repositorio.insertar(mensaje)
+
+    def historial(self, dni: str) -> list[dict]:
+        """Historial del alumno ordenado; `[]` sin error si no hay mensajes (FR-008)."""
+        return self._repositorio.consultar_por_dni(dni)
