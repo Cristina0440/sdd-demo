@@ -32,7 +32,7 @@ README en español con pasos para ejecutar en local en Windows.
 
 **Target Platform**: Servidor web Python ejecutándose en local en Windows para desarrollo (`uv run uvicorn`); desplegable en cualquier entorno Python
 
-**Project Type**: web-service (API REST: `POST /mensajes` y `GET /mensajes?dni=`)
+**Project Type**: web-service (API REST: `POST /mensajes` y `POST /mensajes/consulta`)
 
 **Performance Goals**: consulta de historial en menos de 2 segundos con hasta 10.000 mensajes almacenados (SC-003)
 
@@ -96,7 +96,7 @@ app/
 ├── repositories/
 │   └── mensajes_repositorio.py # Protocolo + implementación supabase-py
 └── routes/
-    └── mensajes_ruta.py     # POST /mensajes y GET /mensajes?dni=
+    └── mensajes_ruta.py     # POST /mensajes y POST /mensajes/consulta
 
 db/
 └── schema.sql               # SQL para crear la tabla en Supabase (sin cambios)

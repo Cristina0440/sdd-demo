@@ -8,8 +8,8 @@ descartan datos inválidos sin persistir nada (FR-012).
 
 ## Convenciones
 
-- **Content-Type**: `application/json` en peticiones y respuestas (salvo GET
-  sin body).
+- **Content-Type**: `application/json` en peticiones y respuestas (ambas rutas
+  son POST: `POST /mensajes` y `POST /mensajes/consulta`).
 - **Errores**: siempre cuerpo `{"mensaje": "<explicación clara>"}` y, cuando
   aplique, `{"campo": "<nombre del campo inválido>"}`. Nunca se devuelven
   stack traces ni detalles internos (constitución V).
@@ -81,15 +81,21 @@ inalcanzable); el detalle completo solo en el log del servidor:
 
 ---
 
-## GET /mensajes?dni={dni}
+## POST /mensajes/consulta
 
 Historial de mensajes de un alumno, del más reciente al más antiguo (FR-007).
+El DNI viaja en el cuerpo de la petición (nunca en la URL), de modo que no
+aparezca ni en los logs de acceso ni en URLs compartidas (principio VIII).
 
-### Parámetros de consulta
+### Request
 
-| Parámetro | Tipo | Regla |
-|-----------|------|-------|
-| `dni` | string (query, obligatorio) | exactamente 8 dígitos; si falta o es inválido → `400` |
+```json
+{ "dni": "12345678" }
+```
+
+| Campo | Tipo | Regla |
+|-------|------|-------|
+| `dni` | string (body, obligatorio) | exactamente 8 dígitos; si falta o es inválido → `400` |
 
 ### Respuestas
 

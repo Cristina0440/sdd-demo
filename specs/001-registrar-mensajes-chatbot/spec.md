@@ -187,7 +187,8 @@ y el destino (bot o asesor humano) son los esperados.
 - **FR-005**: El sistema MUST asignar un id único y la fecha/hora de
   registro a cada mensaje aceptado.
 - **FR-006**: El sistema MUST permitir consultar el historial de mensajes de
-  un alumno a partir de su DNI.
+  un alumno a partir de su DNI (vía `POST /mensajes/consulta` con el DNI en el
+  cuerpo JSON, sin exponerlo en la URL ni en los logs — principio VIII).
 - **FR-007**: El historial MUST devolver los mensajes del alumno ordenados
   del más reciente al más antiguo según su fecha/hora de registro.
 - **FR-008**: El historial MUST incluir únicamente los mensajes cuyo DNI

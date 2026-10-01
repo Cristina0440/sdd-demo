@@ -68,9 +68,10 @@ esperado `409` y una única fila en la base. Repetir el mismo texto pasados
 ### 4. Consultar historial ordenado (US2, FR-007)
 
 Registrar 3 mensajes con el mismo DNI y distintos textos, luego
-`GET /mensajes?dni=12345678` → esperado `200` con los 3 mensajes del más
-reciente al más antiguo. `GET /mensajes?dni=87654321` (sin mensajes) →
-esperado `200` con `[]`. `GET /mensajes?dni=123` → esperado `400`.
+`POST /mensajes/consulta` con `{"dni":"12345678"}` → esperado `200` con los
+3 mensajes del más reciente al más antiguo. `POST /mensajes/consulta` con
+`{"dni":"87654321"}` (sin mensajes) → esperado `200` con `[]`.
+`POST /mensajes/consulta` con `{"dni":"123"}` → esperado `400`.
 
 ### 5. Clasificación y destino bot/asesor (US3, FR-009/011/015)
 
@@ -100,8 +101,9 @@ select 'Alumno Ficticio', '11111111', '999999999',
 from generate_series(1, 10000) as g;
 ```
 
-Luego `GET /mensajes?dni=11111111` y medir el tiempo de respuesta (p. ej.
-con `Measure-Command` de PowerShell o las herramientas del navegador) →
+Luego `POST /mensajes/consulta` con `{"dni":"11111111"}` y medir el tiempo
+de respuesta (p. ej. con `Measure-Command` de PowerShell o las herramientas
+del navegador) →
 esperado: menos de 2 segundos. Validación manual, sin herramienta de carga.
 
 ## Criterios de aceptación de la guía
