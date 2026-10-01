@@ -3,6 +3,7 @@
 import uuid
 from datetime import UTC, datetime
 
+from app.classification.palabras_clave import clasificar
 from app.errors import AppError
 from app.validation import MensajeRegistro
 
@@ -41,7 +42,6 @@ class ServicioMensajes:
             "fecha_hora": datetime.now(UTC)
             .isoformat(timespec="milliseconds")
             .replace("+00:00", "Z"),
-            # Temporal hasta que US3 instale el clasificador (FR-009)
-            "clasificacion": "otro",
+            "clasificacion": clasificar(entrada.texto),
         }
         return self._repositorio.insertar(mensaje)

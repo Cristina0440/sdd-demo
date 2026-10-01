@@ -123,17 +123,17 @@ description: "Lista de tareas para la implementación de la feature"
 
 > **NOTA: Escribir estos tests PRIMERO y verificar que FALLAN antes de implementar**
 
-- [ ] T029 [P] [US3] Test unitario de clasificación por categoría con las listas del Apéndice A de data-model.md ("devolución"/"reembolso" → `devolucion`, "ciclo"/"horario"/"turno" → `informacion_ciclo`, "inscribirme"/"matricularme"/"separar vacante" → `interes_inscripcion`, sin palabras clave → `otro`), en `tests/unit/test_clasificacion.py`
-- [ ] T030 [P] [US3] Test unitario de prioridad ante texto mixto (FR-011: `devolucion` > `interes_inscripcion` > `informacion_ciclo` > `otro`, p. ej. "anular matrícula" → `devolucion`) y de tolerancia a mayúsculas/acentos ("DEVOLUCIÓN" → `devolucion`), en `tests/unit/test_clasificacion_prioridad.py`
-- [ ] T031 [P] [US3] Test unitario de palabra o frase con límites: "devolucionista" NO clasifica como `devolucion`, en `tests/unit/test_clasificacion_palabra_completa.py`
-- [ ] T032 [P] [US3] Test de contrato: POST devuelve `clasificacion` correcta según el texto (devoluciones e interés en inscripción quedan marcados para asesor, nunca como `"otro"`), en `tests/contract/test_mensajes_post_clasificacion.py`
+- [X] T029 [P] [US3] Test unitario de clasificación por categoría con las listas del Apéndice A de data-model.md ("devolución"/"reembolso" → `devolucion`, "ciclo"/"horario"/"turno" → `informacion_ciclo`, "inscribirme"/"matricularme"/"separar vacante" → `interes_inscripcion`, sin palabras clave → `otro`), en `tests/unit/test_clasificacion.py`
+- [X] T030 [P] [US3] Test unitario de prioridad ante texto mixto (FR-011: `devolucion` > `interes_inscripcion` > `informacion_ciclo` > `otro`, p. ej. "anular matrícula" → `devolucion`) y de tolerancia a mayúsculas/acentos ("DEVOLUCIÓN" → `devolucion`), en `tests/unit/test_clasificacion_prioridad.py`
+- [X] T031 [P] [US3] Test unitario de palabra o frase con límites: "devolucionista" NO clasifica como `devolucion`, en `tests/unit/test_clasificacion_palabra_completa.py`
+- [X] T032 [P] [US3] Test de contrato: POST devuelve `clasificacion` correcta según el texto (devoluciones e interés en inscripción quedan marcados para asesor, nunca como `"otro"`), en `tests/contract/test_mensajes_post_clasificacion.py`
 
 ### Implementación para la historia de usuario 3
 
-- [ ] T033 [P] [US3] Implementar las listas de palabras clave por categoría del Apéndice A de data-model.md (ampliables sin cambiar la lógica, FR-014), la normalización (minúsculas, sin acentos) y la coincidencia por palabra/frase con límites según research D3, en `app/classification/palabras_clave.py`
-- [ ] T034 [US3] Implementar la resolución de prioridad `devolucion > interes_inscripcion > informacion_ciclo > otro` (FR-011) en `app/classification/palabras_clave.py`
-- [ ] T035 [US3] Sustituir el `"otro"` temporal por `clasificar(texto)` en `registrar()` en `app/services/mensajes_servicio.py` (depende de T033, T034)
-- [ ] T036 [US3] Test de integración: registrar textos ficticios de cada categoría y verificar clasificación y marcado para asesor (escenario 5 del quickstart), en `tests/integration/test_clasificacion_mensajes.py`
+- [X] T033 [P] [US3] Implementar las listas de palabras clave por categoría del Apéndice A de data-model.md (ampliables sin cambiar la lógica, FR-014), la normalización (minúsculas, sin acentos) y la coincidencia por palabra/frase con límites según research D3, en `app/classification/palabras_clave.py`
+- [X] T034 [US3] Implementar la resolución de prioridad `devolucion > interes_inscripcion > informacion_ciclo > otro` (FR-011) en `app/classification/palabras_clave.py`
+- [X] T035 [US3] Sustituir el `"otro"` temporal por `clasificar(texto)` en `registrar()` en `app/services/mensajes_servicio.py` (depende de T033, T034)
+- [X] T036 [US3] Test de integración: registrar textos ficticios de cada categoría y verificar clasificación y marcado para asesor (escenario 5 del quickstart), en `tests/integration/test_clasificacion_mensajes.py`
 
 **Punto de control**: Todas las historias de usuario deben quedar funcionales de forma independiente.
 

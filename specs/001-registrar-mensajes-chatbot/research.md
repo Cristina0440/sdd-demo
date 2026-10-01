@@ -141,6 +141,21 @@ quedan `NEEDS CLARIFICATION` en `plan.md`.
   `hypercorn`/`granian` como servidor de desarrollo (uvicorn ya trae
   recarga y es el estándar con FastAPI).
 
+### D11. Consulta de historial: `POST /mensajes/consulta` con el DNI en el cuerpo
+
+- **Decisión**: el historial se consulta con `POST /mensajes/consulta` y el
+  DNI viaja en el cuerpo JSON `{"dni": "12345678"}`, nunca en la URL; el
+  spec (FR-006), el contrato y las tareas (T021–T027) se alinearon en
+  consecuencia. Los logs de validación y de error registran solo campo, tipo
+  de error y endpoint (T041), y el access-log de Uvicorn se mantiene
+  habilitado porque el DNI ya no aparece en la línea de petición.
+- **Razón**: la constitución VIII exige que los datos personales no
+  aparezcan en URLs ni en logs; al mover el DNI al cuerpo, los access-logs
+  quedan limpios por diseño (decisión del usuario 2026-10-01).
+- **Alternativas consideradas**: DNI en header (menos estándar que POST con
+  body), DNI en query con sanitización posterior de logs (deja el DNI en la
+  URL), o proxy que oculte la query (complejidad añadida sin necesidad).
+
 ## Puntos que quedan para fases posteriores
 
 - Contrato de autenticación/autorización de la API: diferido a la

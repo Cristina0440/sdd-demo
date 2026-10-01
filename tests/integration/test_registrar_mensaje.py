@@ -22,7 +22,8 @@ def test_registro_valido_queda_guardado_en_el_repositorio() -> None:
     assert guardado["fecha_hora"]
     assert guardado["dni"] == "12345678"
     assert guardado["telefono"] == "987654321"
-    assert guardado["clasificacion"] == "otro"
+    # US3 (T035) sustituyó el "otro" temporal por la clasificación real
+    assert guardado["clasificacion"] == "informacion_ciclo"
 
 
 def test_registro_invalido_no_toca_el_repositorio() -> None:

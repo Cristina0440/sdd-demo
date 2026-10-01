@@ -36,7 +36,7 @@ README en español con pasos para ejecutar en local en Windows.
 
 **Performance Goals**: consulta de historial en menos de 2 segundos con hasta 10.000 mensajes almacenados (SC-003)
 
-**Constraints**: validación Pydantic en la capa de entrada única (constitución III); credenciales solo en variables de entorno cargadas con pydantic-settings, nunca en el repositorio (constitución IV); códigos HTTP correctos con mensajes claros (constitución V); documentación y comentarios en español (constitución VI); tests exclusivamente con datos ficticios (constitución VII); ventana anti-duplicados de 10 segundos (decisión del usuario); canalización de CI en Python (`uv run ruff check` + `uv run pytest`)
+**Constraints**: validación Pydantic en la capa de entrada única (constitución III); credenciales solo en variables de entorno cargadas con pydantic-settings, nunca en el repositorio (constitución IV); códigos HTTP correctos con mensajes claros (constitución V); documentación y comentarios en español (constitución VI); tests exclusivamente con datos ficticios (constitución VII); ventana anti-duplicados de 10 segundos (decisión del usuario); canalización de CI en Python (`uv run ruff check` + `uv run pytest`); logs y URLs libres de datos personales (constitución VIII)
 
 **Scale/Scope**: hasta 10.000 mensajes; 2 endpoints REST; 1 tabla; listas de palabras clave ampliables sin cambiar la lógica de clasificación (FR-014)
 
@@ -53,6 +53,7 @@ README en español con pasos para ejecutar en local en Windows.
 | V | Manejo de Errores con Códigos HTTP Correctos | PASS | 400 entrada inválida (Pydantic), 409 duplicado, 500 error interno con detalle solo en el servidor; mensajes claros sin stack traces, vía exception handlers de FastAPI |
 | VI | Documentación y Comentarios en Español | PASS | README en español con pasos para Windows (PowerShell), comentarios en español que expliquen el porqué |
 | VII | Solo Datos Ficticios en Pruebas (NO NEGOCIABLE) | PASS | DNIs/teléfonos de prueba ficticios y deterministas (p. ej. `987654321`); repositorio falso en memoria; cero datos reales |
+| VIII | Protección de Datos Personales | PASS | El DNI del historial viaja en el cuerpo JSON (`POST /mensajes/consulta`), nunca en la URL; logs solo con campo/tipo/endpoint y trazas sin valores; los errores no devuelven datos; el access-log queda limpio al viajar el DNI en el body |
 
 **Gate result**: PASS — sin violaciones; `Complexity Tracking` queda vacío.
 
