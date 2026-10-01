@@ -22,6 +22,12 @@ create table if not exists mensajes (
   )
 );
 
+-- Seguridad a nivel de fila (RLS): habilitada SIN políticas. Sin políticas, el
+-- acceso público (anon key) queda bloqueado por completo; el servicio se conecta
+-- con la service role key, que salta (bypasea) el RLS, por lo que su lectura y
+-- escritura no se ven afectadas.
+alter table mensajes enable row level security;
+
 -- Índice para la consulta de historial por DNI (SC-003: < 2 s con 10.000 mensajes).
 create index if not exists mensajes_dni_fecha_hora_idx
   on mensajes (dni, fecha_hora desc);

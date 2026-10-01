@@ -64,19 +64,19 @@ description: "Lista de tareas para la implementación de la feature"
 
 > **NOTA: Escribir estos tests PRIMERO y verificar que FALLAN antes de implementar**
 
-- [ ] T010 [P] [US1] Test de contrato: POST `/mensajes` con body válido cuyo texto sea "Hola, buenas tardes" (sin palabras clave, para que la expectativa `clasificacion: "otro"` siga siendo válida tras US3) → `201` con `id`, `fecha_hora`, `clasificacion: "otro"`, en `tests/contract/mensajes-post.test.ts`
-- [ ] T011 [P] [US1] Test de contrato: POST rechaza `nombre` vacío («no vacío»), `dni` "12345" («exactamente 8 dígitos»), `telefono` "61234567X" («exactamente 9 dígitos») y `texto` "   " («no vacío ni solo espacios») con `400` + `campo`, y el repositorio NUNCA recibe `insertar`, en `tests/contract/mensajes-post-validacion.test.ts`
-- [ ] T012 [P] [US1] Test de contrato: POST idéntico (mismo dni + mismo texto tras `trim`) dentro de la ventana de 10 segundos → `409`, sin guardar; fuera de la ventana → `201`, en `tests/contract/mensajes-post-duplicado.test.ts`
-- [ ] T013 [P] [US1] Test unitario del esquema zod de registro: `«nombre: obligatorio, no vacío (tras trim)»`, `«dni: exactamente 8 dígitos numéricos ^[0-9]{8}$»`, `«telefono: exactamente 9 dígitos numéricos ^[0-9]{9}$»` tras normalizar, `«texto: no vacío ni solo espacios en blanco»`, en `tests/unit/mensaje-esquema.test.ts`
-- [ ] T014 [P] [US1] Test unitario de normalización de teléfono: `+34 612 345 678` → `612345678` válido; `+35161234567` → rechazado, en `tests/unit/normalizacion-telefono.test.ts`
+- [X] T010 [P] [US1] Test de contrato: POST `/mensajes` con body válido cuyo texto sea "Hola, buenas tardes" (sin palabras clave, para que la expectativa `clasificacion: "otro"` siga siendo válida tras US3) → `201` con `id`, `fecha_hora`, `clasificacion: "otro"`, en `tests/contract/mensajes-post.test.ts`
+- [X] T011 [P] [US1] Test de contrato: POST rechaza `nombre` vacío («no vacío»), `dni` "12345" («exactamente 8 dígitos»), `telefono` "61234567X" («exactamente 9 dígitos») y `texto` "   " («no vacío ni solo espacios») con `400` + `campo`, y el repositorio NUNCA recibe `insertar`, en `tests/contract/mensajes-post-validacion.test.ts`
+- [X] T012 [P] [US1] Test de contrato: POST idéntico (mismo dni + mismo texto tras `trim`) dentro de la ventana de 10 segundos → `409`, sin guardar; fuera de la ventana → `201`, en `tests/contract/mensajes-post-duplicado.test.ts`
+- [X] T013 [P] [US1] Test unitario del esquema zod de registro: `«nombre: obligatorio, no vacío (tras trim)»`, `«dni: exactamente 8 dígitos numéricos ^[0-9]{8}$»`, `«telefono: exactamente 9 dígitos numéricos ^[0-9]{9}$»` tras normalizar, `«texto: no vacío ni solo espacios en blanco»`, en `tests/unit/mensaje-esquema.test.ts`
+- [X] T014 [P] [US1] Test unitario de normalización de teléfono: `+34 612 345 678` → `612345678` válido; `+35161234567` → rechazado, en `tests/unit/normalizacion-telefono.test.ts`
 
 ### Implementación para la historia de usuario 1
 
-- [ ] T015 [US1] Implementar el esquema zod de registro con las reglas verbatim de T013, incluida la de `nombre` (FR-017), rechazando antes de persistir nada (FR-012), en `src/validacion/mensaje-esquema.ts`
-- [ ] T016 [US1] Implementar la interfaz del repositorio + el cliente `supabase-js` (cliente único, service key del entorno) con `insertar(mensaje)` y `buscarReciente(dni, texto, ventanaSegundos)` (para la ventana de 10 s, FR-016), en `src/repositorios/mensajes-repositorio.ts`
-- [ ] T017 [US1] Implementar `registrar()`: valida con T015 → consulta duplicados (→ `AppError` 409) → asigna `id` uuid y `fecha_hora` del servidor → `clasificacion: "otro"` temporal → persiste, en `src/servicios/mensajes-servicio.ts`
-- [ ] T018 [US1] Implementar la ruta `POST /mensajes` y registrarla en la app, en `src/rutas/mensajes-ruta.ts` (y editar `src/app.ts`)
-- [ ] T019 [US1] Test de integración: flujo completo con repositorio falso en memoria — el registro válido queda guardado, el inválido no toca el repositorio, en `tests/integration/registrar-mensaje.test.ts`
+- [X] T015 [US1] Implementar el esquema zod de registro con las reglas verbatim de T013, incluida la de `nombre` (FR-017), rechazando antes de persistir nada (FR-012), en `src/validacion/mensaje-esquema.ts`
+- [X] T016 [US1] Implementar la interfaz del repositorio + el cliente `supabase-js` (cliente único, service key del entorno) con `insertar(mensaje)` y `buscarReciente(dni, texto, ventanaSegundos)` (para la ventana de 10 s, FR-016), en `src/repositorios/mensajes-repositorio.ts`
+- [X] T017 [US1] Implementar `registrar()`: valida con T015 → consulta duplicados (→ `AppError` 409) → asigna `id` uuid y `fecha_hora` del servidor → `clasificacion: "otro"` temporal → persiste, en `src/servicios/mensajes-servicio.ts`
+- [X] T018 [US1] Implementar la ruta `POST /mensajes` y registrarla en la app, en `src/rutas/mensajes-ruta.ts` (y editar `src/app.ts`)
+- [X] T019 [US1] Test de integración: flujo completo con repositorio falso en memoria — el registro válido queda guardado, el inválido no toca el repositorio, en `tests/integration/registrar-mensaje.test.ts`
 
 **Punto de control**: En este punto la historia de usuario 1 debe funcionar y probarse de forma independiente (incremento base).
 
