@@ -1,20 +1,15 @@
 <!--
 Sync Impact Report
 ==================
-- Version change: N/A (scaffold sin ratificar) → 1.0.0
-- Modified principles:
-  - [PRINCIPLE_1_NAME] → I. Simplicidad y Legibilidad
-  - [PRINCIPLE_2_NAME] → II. Cobertura de Tests Automatizados
-  - [PRINCIPLE_3_NAME] → III. Validación de Entrada
-  - [PRINCIPLE_4_NAME] → IV. Credenciales en Variables de Entorno
-  - [PRINCIPLE_5_NAME] → V. Manejo de Errores con Códigos HTTP Correctos
-  - (nuevo) → VI. Documentación y Comentarios en Español
-  - (nuevo) → VII. Solo Datos Ficticios en Pruebas
+- Version change: 1.0.0 → 1.1.0 (MINOR: nuevo principio añadido)
+- Modified principles: ninguno (I–VII conservan su texto)
 - Added sections:
-  - Estándares de Calidad (antes: [SECTION_2_NAME] sin rellenar)
-  - Flujo de Desarrollo (antes: [SECTION_3_NAME] sin rellenar)
+  - Nuevo principio VIII «Protección de Datos Personales»: sin datos
+    personales en logs, consola, respuestas de error ni URLs; logs solo con
+    campo/tipo/endpoint; datos personales fuera de query strings;
+    exportación real solo con aprobación; HTTPS obligatorio fuera de local
 - Removed sections: ninguna
-- Follow-up TODOs: ninguno (todos los placeholders resueltos)
+- Follow-up TODOs: ninguno
 -->
 
 # sdd-demo Constitution
@@ -132,6 +127,22 @@ Rationale: los datos reales en pruebas exponen información sensible,
 incumplen normativas de privacidad y hacen que los tests dependan de
 entornos no reproducibles.
 
+### VIII. Protección de Datos Personales
+
+Los datos personales (DNI, teléfono, nombre, texto de los mensajes) MUST NOT
+aparecer en los logs de la aplicación, en los registros de acceso del
+servidor, en la salida de consola, en las respuestas de error ni en las URLs.
+Los logs registran nombres de campo, tipos de error y endpoints, nunca valores.
+Los datos personales MUST NOT enviarse en query strings. Los datos personales
+reales MUST NOT exportarse ni copiarse fuera de la base de datos sin
+aprobación. En cualquier entorno no local, el servicio MUST ser accesible
+únicamente por HTTPS.
+
+Rationale: los datos personales suelen filtrarse a través de logs, consolas,
+respuestas de error y URLs; excluirlos de esos canales reduce el riesgo de
+filtraciones, de incumplimiento normativo y de exposición en copias de
+seguridad, pantallas y herramientas de observación.
+
 ## Estándares de Calidad
 
 - La puerta de calidad de cualquier cambio es: tests automatizados en
@@ -178,4 +189,4 @@ entornos no reproducibles.
   el proceso de enmienda descrito arriba; ninguna decisión externa a este
   proceso modifica la constitución.
 
-**Version**: 1.0.0 | **Ratified**: 2026-09-30 | **Last Amended**: 2026-09-30
+**Version**: 1.1.0 | **Ratified**: 2026-09-30 | **Last Amended**: 2026-10-01
