@@ -28,7 +28,7 @@ Registra un mensaje nuevo enviado por el chatbot. Valida, clasifica y guarda.
 {
   "nombre": "Ana Prueba",
   "dni": "12345678",
-  "telefono": "612345678",
+  "telefono": "987654321",
   "texto": "Quiero información del ciclo"
 }
 ```
@@ -37,7 +37,7 @@ Registra un mensaje nuevo enviado por el chatbot. Valida, clasifica y guarda.
 |-------|------|--------------------------|
 | `nombre` | string | obligatorio, no vacío |
 | `dni` | string | obligatorio, exactamente 8 dígitos (FR-002) |
-| `telefono` | string | obligatorio, exactamente 9 dígitos tras normalizar `+34`/espacios (FR-003) |
+| `telefono` | string | obligatorio, celular peruano: exactamente 9 dígitos que empiezan por 9; se admiten espacios o guiones y un prefijo opcional `+51`/`51` (FR-003) |
 | `texto` | string | obligatorio, no vacío ni solo espacios (FR-004) |
 
 ### Respuestas
@@ -49,7 +49,7 @@ Registra un mensaje nuevo enviado por el chatbot. Valida, clasifica y guarda.
   "id": "3f6b2f0e-…",
   "nombre": "Ana Prueba",
   "dni": "12345678",
-  "telefono": "612345678",
+  "telefono": "987654321",
   "texto": "Quiero información del ciclo",
   "fecha_hora": "2026-10-01T12:34:56.789Z",
   "clasificacion": "informacion_ciclo"
@@ -103,7 +103,7 @@ hay mensajes:
     "id": "9a1c…",
     "nombre": "Ana Prueba",
     "dni": "12345678",
-    "telefono": "612345678",
+    "telefono": "987654321",
     "texto": "Quiero información del ciclo",
     "fecha_hora": "2026-10-01T12:34:56.789Z",
     "clasificacion": "informacion_ciclo"

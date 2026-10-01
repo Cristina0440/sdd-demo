@@ -2,12 +2,12 @@ import { describe, expect, it } from "vitest";
 import { esquemaRegistro } from "../../src/validacion/mensaje-esquema";
 
 // T013 — Test unitario del esquema zod de registro: las reglas exactas de
-// spec.md/FR (nombre no vacío tras trim, DNI ^[0-9]{8}$, teléfono ^[0-9]{9}$
-// tras normalizar, texto no vacío ni solo espacios).
+// spec.md/FR (nombre no vacío tras trim, DNI ^[0-9]{8}$, celular peruano
+// ^9[0-9]{8}$ tras normalizar, texto no vacío ni solo espacios).
 const base = {
   nombre: "Ana Prueba",
   dni: "12345678",
-  telefono: "612345678",
+  telefono: "987654321",
   texto: "Hola, buenas tardes",
 };
 
@@ -35,15 +35,18 @@ describe("esquema de registro (zod)", () => {
     expect(fallo.error?.issues[0].message).toBe("El DNI debe tener exactamente 8 dígitos");
   });
 
-  it("telefono: exactamente 9 dígitos numéricos ^[0-9]{9}$ tras normalizar", () => {
-    expect(esquemaRegistro.safeParse({ ...base, telefono: "+34 612 345 678" }).success).toBe(true);
-    expect(esquemaRegistro.safeParse({ ...base, telefono: "612 345 678" }).success).toBe(true);
-    for (const invalido of ["61234567", "61234567890", "61234567X", ""]) {
+  it("telefono: celular peruano — exactamente 9 dígitos ^9[0-9]{8}$ tras normalizar", () => {
+    expect(esquemaRegistro.safeParse({ ...base, telefono: "987654321" }).success).toBe(true);
+    expect(esquemaRegistro.safeParse({ ...base, telefono: "+51 987 654 321" }).success).toBe(true);
+    expect(esquemaRegistro.safeParse({ ...base, telefono: "987 654 321" }).success).toBe(true);
+    for (const invalido of ["98765432", "876543210", "98765432X", "+34 612 345 678", ""]) {
       expect(esquemaRegistro.safeParse({ ...base, telefono: invalido }).success).toBe(false);
     }
-    const fallo = esquemaRegistro.safeParse({ ...base, telefono: "61234567" });
+    const fallo = esquemaRegistro.safeParse({ ...base, telefono: "876543210" });
     expect(fallo.success).toBe(false);
-    expect(fallo.error?.issues[0].message).toBe("El teléfono debe tener exactamente 9 dígitos");
+    expect(fallo.error?.issues[0].message).toBe(
+      "El teléfono debe tener exactamente 9 dígitos y empezar por 9",
+    );
   });
 
   it("texto: no vacío ni solo espacios en blanco, y se conserva tal cual llegó", () => {

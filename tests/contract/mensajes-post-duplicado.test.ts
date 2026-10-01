@@ -13,7 +13,7 @@ describe("POST /mensajes — contrato de duplicados (ventana de 10 s)", () => {
     const cuerpo = {
       nombre: "Ana Prueba",
       dni: "12345678",
-      telefono: "612345678",
+      telefono: "987654321",
       texto: "Quiero información del ciclo",
     };
 

@@ -9,15 +9,17 @@ en [data-model.md](./data-model.md).
 
 ## Requisitos previos
 
-- Node.js 20 LTS o superior y npm (comprobar: `node --v`, `npm -v`).
+- Python 3.12 o superior y [uv](https://docs.astral.sh/uv/) (comprobar:
+  `python --version`, `uv --version`; instalar uv en PowerShell con
+  `powershell -c "irm https://astral.sh/uv/install.ps1 | iex"`).
 - Una cuenta de Supabase con un proyecto creado (https://supabase.com).
 - Terminal PowerShell (Windows).
 
 ## Puesta en marcha
 
 ```powershell
-# 1. Instalar dependencias
-npm install
+# 1. Instalar dependencias y el entorno virtual (uv crea .venv y uv.lock)
+uv sync
 
 # 2. Crear el archivo de entorno a partir de la plantilla (sin valores reales)
 Copy-Item .env.example .env
@@ -25,21 +27,21 @@ Copy-Item .env.example .env
 
 # 3. Crear la tabla: pegar y ejecutar db/schema.sql en el SQL Editor de Supabase
 
-# 4. Arrancar en desarrollo (http://localhost:3000 por defecto)
-npm run dev
+# 4. Arrancar en desarrollo (http://localhost:8000 por defecto, con recarga)
+uv run uvicorn app.main:app --reload
 ```
 
-Si falta alguna variable obligatoria en `.env`, el servicio debe arrancar con
-un mensaje claro indicando cuál (constitución IV).
+Si falta alguna variable obligatoria en `.env`, el servicio debe detenerse al
+arrancar con un mensaje claro indicando cuál (constitución IV).
 
 ## Ejecutar los tests (sin base de datos real)
 
 ```powershell
-npm test
+uv run pytest
 ```
 
-**Resultado esperado**: todos los tests en verde con `supabase-js` mockeado y
-solo datos ficticios (constitución VII).
+**Resultado esperado**: todos los tests en verde con el repositorio falso en
+memoria (inyectado en la app) y solo datos ficticios (constitución VII).
 
 ## Escenarios de validación manual
 
@@ -47,14 +49,14 @@ Referencias: contratos en [contracts/api-mensajes.md](./contracts/api-mensajes.m
 
 ### 1. Registrar un mensaje válido (US1)
 
-`POST /mensajes` con `{"nombre":"Ana Prueba","dni":"12345678","telefono":"612345678","texto":"Quiero información del ciclo"}`
+`POST /mensajes` con `{"nombre":"Ana Prueba","dni":"12345678","telefono":"987654321","texto":"Quiero información del ciclo"}`
 
 → Esperado: `201` con `id`, `fecha_hora` y `clasificacion: "informacion_ciclo"`.
 
 ### 2. Rechazar datos inválidos (US1, FR-002/003/004)
 
 - DNI `"12345"` → esperado `400`, campo `dni`, y el mensaje NO se guarda.
-- Teléfono `"61234567X"` → esperado `400`, campo `telefono`.
+- Teléfono `"98765432X"` → esperado `400`, campo `telefono`.
 - Texto `"   "` → esperado `400`, campo `texto`.
 
 ### 3. Rechazar duplicado dentro de 10 s (FR-016)
@@ -104,6 +106,6 @@ esperado: menos de 2 segundos. Validación manual, sin herramienta de carga.
 
 ## Criterios de aceptación de la guía
 
-- `npm test` en verde sin red ni base de datos.
+- `uv run pytest` en verde sin red ni base de datos.
 - Los 6 escenarios anteriores producen exactamente los resultados esperados.
 - `README.md` (en español) reproduce estos pasos para un compañero en Windows.

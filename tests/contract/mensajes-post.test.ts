@@ -14,7 +14,7 @@ describe("POST /mensajes — contrato de registro válido", () => {
     const respuesta = await request(app).post("/mensajes").send({
       nombre: "Ana Prueba",
       dni: "12345678",
-      telefono: "612345678",
+      telefono: "987654321",
       texto: "Hola, buenas tardes",
     });
 
@@ -25,7 +25,7 @@ describe("POST /mensajes — contrato de registro válido", () => {
     expect(respuesta.body).toMatchObject({
       nombre: "Ana Prueba",
       dni: "12345678",
-      telefono: "612345678",
+      telefono: "987654321",
       texto: "Hola, buenas tardes",
     });
     expect(repositorio.mensajes).toHaveLength(1);

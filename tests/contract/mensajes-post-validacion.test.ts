@@ -15,22 +15,22 @@ const casosInvalidos: CasioInvalido[] = [
   {
     titulo: "nombre vacío",
     campo: "nombre",
-    cuerpo: { nombre: "", dni: "12345678", telefono: "612345678", texto: "Hola, buenas tardes" },
+    cuerpo: { nombre: "", dni: "12345678", telefono: "987654321", texto: "Hola, buenas tardes" },
   },
   {
     titulo: 'dni "12345" (no tiene 8 dígitos)',
     campo: "dni",
-    cuerpo: { nombre: "Ana Prueba", dni: "12345", telefono: "612345678", texto: "Hola, buenas tardes" },
+    cuerpo: { nombre: "Ana Prueba", dni: "12345", telefono: "987654321", texto: "Hola, buenas tardes" },
   },
   {
-    titulo: 'telefono "61234567X" (no son 9 dígitos)',
+    titulo: 'telefono "98765432X" (no son 9 dígitos)',
     campo: "telefono",
-    cuerpo: { nombre: "Ana Prueba", dni: "12345678", telefono: "61234567X", texto: "Hola, buenas tardes" },
+    cuerpo: { nombre: "Ana Prueba", dni: "12345678", telefono: "98765432X", texto: "Hola, buenas tardes" },
   },
   {
     titulo: 'texto "   " (solo espacios)',
     campo: "texto",
-    cuerpo: { nombre: "Ana Prueba", dni: "12345678", telefono: "612345678", texto: "   " },
+    cuerpo: { nombre: "Ana Prueba", dni: "12345678", telefono: "987654321", texto: "   " },
   },
 ];
 

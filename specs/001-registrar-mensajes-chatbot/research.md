@@ -39,13 +39,13 @@ quedan `NEEDS CLARIFICATION` en `plan.md`.
 ### D3. Clasificación por palabras clave con normalización y prioridad fija
 
 - **Decisión**: listas de palabras clave por categoría en un módulo propio
-  (`src/clasificacion/palabras-clave.ts`), ampliables sin tocar la lógica
+  (`app/classification/palabras_clave.py`), ampliables sin tocar la lógica
   (FR-014). El texto se normaliza a minúsculas y sin acentos y se compara por
   palabra completa (evita "devolucionista" → "devolucion"). Prioridad:
   `devolucion` > `interes_inscripcion` > `informacion_ciclo` > `otro`
   (FR-011). La clasificación se calcula una sola vez, al registrar.
 - **Razón**: es lo que exige el spec y es testeable en unit tests puros con
-  vitest.
+  pytest.
 - **Alternativas consideradas**: clasificador NLP/LLM (coste, respuestas no
   deterministas, complejidad innecesaria para listas cortas de palabras clave);
   expresiones regulares libres por usuario (frágiles y difíciles de revisar).
@@ -62,12 +62,13 @@ quedan `NEEDS CLARIFICATION` en `plan.md`.
   periódica desde el servicio, `pg_cron` en Supabase, solo filtro en
   lectura, anonimización in situ.
 
-### D5. Acceso a Supabase: `supabase-js` con service role, solo servidor
+### D5. Acceso a Supabase: `supabase-py` con service role, solo servidor
 
-- **Decisión**: un único cliente `createClient(url, serviceRoleKey)` creado
-  detrás de la interfaz del repositorio; las claves viven en `.env`
-  (git-ignored) con `.env.example` sin valores; el arranque valida las
-  variables con zod y falla con mensaje claro si faltan.
+- **Decisión**: un único cliente `create_client(url, service_role_key)` de
+  `supabase-py`, creado detrás del Protocolo del repositorio; las claves
+  viven en `.env` (git-ignored) con `.env.example` sin valores; el arranque
+  valida las variables con `pydantic-settings` y falla con mensaje claro si
+  faltan.
 - **Razón**: la API es de uso interno (chatbot y equipo de ventas), no hay
   navegador de por medio, así que la service key no sale del servidor
   (constitución IV).
@@ -77,7 +78,7 @@ quedan `NEEDS CLARIFICATION` en `plan.md`.
 
 ### D6. Mapeo de errores: 400 / 409 / 500 con mensajes claros
 
-- **Decisión**: fallo de validación zod → **400** con el campo y el motivo
+- **Decisión**: fallo de validación de Pydantic → **400** con el campo y el motivo
   (DNI ≠ 8 dígitos, teléfono ≠ 9 dígitos, texto vacío, duplicado → **409**);
   error inesperado → **500** con mensaje genérico y detalle solo en el log
   del servidor (constitución V). Nunca se guarda nada si la validación falla.
@@ -86,18 +87,19 @@ quedan `NEEDS CLARIFICATION` en `plan.md`.
   todas las reglas de este servicio son de formato en la entrada → 400 es
   suficiente y más simple; se deja documentado por si crece).
 
-### D7. Estrategia de tests: mock en la frontera del repositorio
+### D7. Estrategia de tests: falso en memoria en la frontera del repositorio
 
-- **Decisión**: los tests mockean el repositorio (o `supabase-js`) para que
-  `npm test` funcione sin base de datos real: unit (clasificación,
-  esquemas zod, normalización de teléfono), contract (supertest contra la app
-  Express con repositorio falso) e integration (flujo registro → consulta con
-  repositorio en memoria). Solo datos ficticios (constitución VII).
+- **Decisión**: los tests inyectan un repositorio falso en memoria para que
+  `uv run pytest` funcione sin base de datos real: unit (clasificación,
+  modelos Pydantic, normalización de teléfono), contract (FastAPI `TestClient`
+  contra la app con repositorio falso) e integration (flujo registro →
+  consulta con repositorio en memoria). Solo datos ficticios (constitución
+  VII).
 - **Razón**: requisito explícito del usuario y permite cubrir los casos
   límite (orden estable, ventana de duplicados, purga) de forma determinista.
 - **Alternativas consideradas**: tests contra una base Supabase real
   (incumple el requisito y es frágil en local); contenedor PostgreSQL local
-  (añade dependencia pesada para un mock ya suficiente).
+  (añade dependencia pesada para un falso ya suficiente).
 
 ### D8. Esquema de la tabla: restricciones en la base + validación en la entrada
 
@@ -106,7 +108,7 @@ quedan `NEEDS CLARIFICATION` en `plan.md`.
   `clasificacion text` con `CHECK` para cada regla (ver `data-model.md`);
   índice en `(dni, fecha_hora DESC)`. El SQL de creación se entregará en
   `db/schema.sql` (fase de implementación).
-- **Razón**: la validación zod es la puerta de entrada (constitución III) y
+- **Razón**: la validación con Pydantic es la puerta de entrada (constitución III) y
   los `CHECK` son la red de seguridad que garantiza el invariant aunque
   alguien escriba directamente en la base.
 - **Alternativas consideradas**: tipos ENUM de PostgreSQL (más rígidos al
@@ -124,15 +126,19 @@ quedan `NEEDS CLARIFICATION` en `plan.md`.
 - **Alternativas consideradas**: usar solo `fecha_hora` (orden no estable
   con empates); contador secuencial (complejidad añadida sin necesidad).
 
-### D10. Ejecución local en Windows
+### D10. Ejecución local en Windows con uv
 
-- **Decisión**: `package.json` con scripts `dev` (tsx watch), `build`,
-  `start` y `test` (vitest); dotenv carga `.env`; comandos documentados en
-  PowerShell en el README (constitución VI).
-- **Razón**: requisito explícito del usuario; `tsx` evita pasos manuales de
-  compilación en desarrollo.
-- **Alternativas consideradas**: `nodemon` + `ts-node` (más piezas); solo
-  build compilado en cada cambio (lento en desarrollo).
+- **Decisión**: proyecto gestionado con **uv** (`pyproject.toml` con
+  dependencias, scripts y configuración de pytest + `uv.lock` versionado);
+  desarrollo con `uv run uvicorn app.main:app --reload` (recarga automática),
+  tests con `uv run pytest`; `pydantic-settings` carga `.env`; comandos
+  documentados en PowerShell en el README (constitución VI).
+- **Razón**: requisito explícito del usuario; uv instala Python y las
+  dependencias en un solo paso, con lockfile reproducible en Windows.
+- **Alternativas consideradas**: `pip` + `venv` manual (más pasos y sin
+  lockfile ágil); `poetry` (más pesado para un proyecto de este tamaño);
+  `hypercorn`/`granian` como servidor de desarrollo (uvicorn ya trae
+  recarga y es el estándar con FastAPI).
 
 ## Puntos que quedan para fases posteriores
 

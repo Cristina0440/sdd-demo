@@ -38,7 +38,7 @@ un mensaje claro.
 **Acceptance Scenarios**:
 
 1. **Given** no hay mensajes registrados, **When** se registra un mensaje con
-   nombre "Ana Prueba", DNI "12345678", teléfono "612345678" y texto
+   nombre "Ana Prueba", DNI "12345678", teléfono "987654321" y texto
    "Quiero información del ciclo", **Then** el mensaje queda guardado con un
    id único y la fecha/hora de registro.
 2. **Given** cualquier estado, **When** se registra un mensaje con DNI
@@ -46,7 +46,7 @@ un mensaje claro.
    mensaje claro indicando que el DNI debe tener 8 dígitos, y el mensaje NO
    se guarda.
 3. **Given** cualquier estado, **When** se registra un mensaje con teléfono
-   "61234567X" (no son 9 dígitos), **Then** el sistema lo rechaza con un
+   "98765432X" (no son 9 dígitos), **Then** el sistema lo rechaza con un
    mensaje claro y el mensaje NO se guarda.
 4. **Given** cualquier estado, **When** se registra un mensaje con texto
    vacío o solo espacios, **Then** el sistema lo rechaza con un mensaje
@@ -137,9 +137,10 @@ y el destino (bot o asesor humano) son los esperados.
 ### Edge Cases
 
 - DNI con más de 8 dígitos o que contenga letras → rechazado como inválido.
-- Teléfono con más de 9 dígitos, espacios o prefijo "+34" → se acepta
-  únicamente si tras normalizar quedan exactamente 9 dígitos; si no,
-  rechazado.
+- Teléfono con separadores (espacios o guiones) o con el prefijo peruano
+  "+51"/"51" → se normaliza a los 9 dígitos; cualquier otro código de país
+  (incluido "+34"), un primer dígito distinto de 9 o una longitud distinta
+  de 9 → rechazado.
 - Texto con solo espacios en blanco o caracteres no visibles → considerado
   vacío y rechazado.
 - Dos alumnos distintos comparten el mismo DNI no es posible (el DNI
@@ -170,8 +171,11 @@ y el destino (bot o asesor humano) son los esperados.
   registro y clasificación.
 - **FR-002**: El sistema MUST rechazar todo mensaje cuyo DNI no tenga
   exactamente 8 dígitos, indicando el motivo en el mensaje de error.
-- **FR-003**: El sistema MUST rechazar todo mensaje cuyo teléfono no tenga
-  exactamente 9 dígitos, indicando el motivo en el mensaje de error.
+- **FR-003**: El sistema MUST rechazar todo mensaje cuyo teléfono no sea un
+  celular peruano válido: exactamente 9 dígitos que empiezan por 9, tras
+  normalizar (se admiten espacios o guiones como separadores y un prefijo
+  opcional "+51" o "51"; cualquier otro código de país, incluido "+34", se
+  rechaza), indicando el motivo en el mensaje de error.
 - **FR-004**: El sistema MUST rechazar todo mensaje cuyo texto esté vacío o
   contenga solo espacios en blanco.
 - **FR-005**: El sistema MUST asignar un id único y la fecha/hora de
@@ -260,9 +264,10 @@ y el destino (bot o asesor humano) son los esperados.
 
 - El DNI se valida por formato: exactamente 8 dígitos numéricos; no se
   verifica su letra ni se comprueba contra un padrón oficial.
-- El teléfono se valida por formato: exactamente 9 dígitos numéricos; se
-  acepta un prefijo internacional "+34" si tras normalizar quedan 9
-  dígitos.
+- El teléfono se valida por formato de celular peruano: exactamente 9
+  dígitos numéricos que empiezan por 9; se aceptan espacios o guiones como
+  separadores y un prefijo opcional "+51" o "51" que se elimina al
+  normalizar; cualquier otro código de país (incluido "+34") se rechaza.
 - La fecha/hora la asigna el sistema en el momento del registro; el
   emisor no la proporciona.
 - El id se genera de forma única e irrepetible para cada mensaje; su

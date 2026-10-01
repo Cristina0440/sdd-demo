@@ -1,13 +1,14 @@
 import { z } from "zod";
 
 /**
- * Normaliza un teléfono (data-model.md): trim → elimina el prefijo `+34` si
- * existe → elimina los espacios. Después solo debe quedar `^[0-9]{9}$`.
+ * Normaliza un teléfono (data-model.md): trim → elimina los separadores
+ * (espacios y guiones) → elimina el prefijo peruano `+51` o `51` si existe.
+ * Después solo debe quedar un celular peruano: `^9[0-9]{8}$`. Cualquier otro
+ * código de país (incluido `+34`) no se elimina y por tanto se rechaza.
  */
 export function normalizarTelefono(telefono: string): string {
-  const recortado = telefono.trim();
-  const sinPrefijo = recortado.startsWith("+34") ? recortado.slice(3) : recortado;
-  return sinPrefijo.replace(/\s+/g, "");
+  const sinSeparadores = telefono.trim().replace(/[\s-]+/g, "");
+  return sinSeparadores.replace(/^\+?51/, "");
 }
 
 /**
@@ -21,11 +22,11 @@ export const esquemaRegistro = z.object({
   nombre: z.string().trim().min(1, "El nombre no puede estar vacío"),
   // FR-002: exactamente 8 dígitos numéricos.
   dni: z.string().trim().regex(/^[0-9]{8}$/, "El DNI debe tener exactamente 8 dígitos"),
-  // FR-003: se normaliza y el resultado debe ser exactamente 9 dígitos.
+  // FR-003: celular peruano, exactamente 9 dígitos que empiezan por 9.
   telefono: z
     .string()
     .transform(normalizarTelefono)
-    .pipe(z.string().regex(/^[0-9]{9}$/, "El teléfono debe tener exactamente 9 dígitos")),
+    .pipe(z.string().regex(/^9[0-9]{8}$/, "El teléfono debe tener exactamente 9 dígitos y empezar por 9")),
   // FR-004: no vacío ni solo espacios, pero se conserva tal cual llegó
   // (por eso se usa `refine` y no `trim`: el historial guarda el texto original).
   texto: z.string().refine((valor) => valor.trim().length > 0, "El texto no puede estar vacío"),

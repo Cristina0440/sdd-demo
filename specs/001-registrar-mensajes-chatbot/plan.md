@@ -7,34 +7,36 @@
 ## Summary
 
 Servicio REST que registra los mensajes que los alumnos envían al chatbot de
-ventas de una academia (validando DNI de 8 dígitos, teléfono de 9 dígitos y
-texto no vacío, con anti-duplicados de 10 segundos), consulta el historial por
-DNI ordenado del más reciente al más antiguo, y clasifica cada mensaje en
-`informacion_ciclo`, `devolucion`, `interes_inscripcion` u `otro` para que el
-chatbot decida qué responde él y qué escala a un asesor de ventas humano.
-Enfoque técnico: Node.js + TypeScript + Express, persistencia en Supabase
-(Supabase/PostgreSQL) con `supabase-js`, validación de entrada con `zod`,
-tests con `vitest` supabase mockeado (sin base de datos real), SQL de creación
-de tabla incluido y README en español con pasos para ejecutar en local en
-Windows.
+ventas de una academia (validando DNI de 8 dígitos, celular peruano de 9
+dígitos y texto no vacío, con anti-duplicados de 10 segundos), consulta el
+historial por DNI ordenado del más reciente al más antiguo, y clasifica cada
+mensaje en `informacion_ciclo`, `devolucion`, `interes_inscripcion` u `otro`
+para que el chatbot decida qué responde él y qué escala a un asesor de ventas
+humano. Enfoque técnico: **Python + FastAPI**, persistencia en Supabase
+(PostgreSQL) con `supabase-py`, validación de entrada con **Pydantic**,
+configuración del entorno con **pydantic-settings** (`.env` con `.env.example`
+sin valores reales), tests con **pytest + FastAPI TestClient** usando un
+repositorio falso en memoria (sin base de datos real), proyecto gestionado con
+**uv**, SQL de creación de tabla incluido (`db/schema.sql`, sin cambios) y
+README en español con pasos para ejecutar en local en Windows.
 
 ## Technical Context
 
-**Language/Version**: TypeScript 5.x sobre Node.js 20 LTS o superior (LTS activa en Windows)
+**Language/Version**: Python 3.12 o superior (gestionado con uv; compatible con Windows)
 
-**Primary Dependencies**: express (servidor HTTP), `@supabase/supabase-js` (cliente de Supabase), zod (validación de entrada y de variables de entorno), dotenv (carga de `.env`); dev: vitest, supertest (tests HTTP), typescript, tsx (arranque en desarrollo)
+**Primary Dependencies**: fastapi (servidor HTTP/ASGI), uvicorn (arranque y recarga en desarrollo), `supabase` (supabase-py, cliente de Supabase), pydantic (validación de entrada), pydantic-settings (carga y validación de `.env`); dev: pytest, httpx (backend del `TestClient` de FastAPI)
 
-**Storage**: Supabase (PostgreSQL gestionado) mediante `supabase-js`; una única tabla `mensajes`; credenciales en `.env` con `.env.example` sin valores reales
+**Storage**: Supabase (PostgreSQL gestionado) mediante `supabase-py`; una única tabla `mensajes` (DDL en `db/schema.sql`, **se mantiene tal cual** — decisión del usuario); credenciales en `.env` con `.env.example` sin valores reales
 
-**Testing**: vitest con `supabase-js` mockeado en la frontera del repositorio: tests unitarios (clasificación, validación), de contrato (endpoints vía supertest) e integración del servicio con repositorio falso — todo sin base de datos real y con solo datos ficticios
+**Testing**: pytest con FastAPI `TestClient` y un repositorio falso inyectado en la app: tests unitarios (clasificación, modelos Pydantic, normalización de teléfono), de contrato (endpoints contra la app) e integración del servicio — todo sin base de datos real y con solo datos ficticios
 
-**Target Platform**: Servidor web Node.js ejecutándose en local en Windows para desarrollo; desplegable en cualquier entorno Node (p. ej. Supabase-adjacente en la nube)
+**Target Platform**: Servidor web Python ejecutándose en local en Windows para desarrollo (`uv run uvicorn`); desplegable en cualquier entorno Python
 
 **Project Type**: web-service (API REST: `POST /mensajes` y `GET /mensajes?dni=`)
 
 **Performance Goals**: consulta de historial en menos de 2 segundos con hasta 10.000 mensajes almacenados (SC-003)
 
-**Constraints**: validación `zod` en la capa de entrada única (constitución III); credenciales solo en variables de entorno, nunca en el repositorio (constitución IV); códigos HTTP correctos con mensajes claros (constitución V); documentación y comentarios en español (constitución VI); tests exclusivamente con datos ficticios (constitución VII); ventana anti-duplicados de 10 segundos (decisión del usuario, sincronizada en spec.md)
+**Constraints**: validación Pydantic en la capa de entrada única (constitución III); credenciales solo en variables de entorno cargadas con pydantic-settings, nunca en el repositorio (constitución IV); códigos HTTP correctos con mensajes claros (constitución V); documentación y comentarios en español (constitución VI); tests exclusivamente con datos ficticios (constitución VII); ventana anti-duplicados de 10 segundos (decisión del usuario); canalización de CI en Python (`uv run pytest`)
 
 **Scale/Scope**: hasta 10.000 mensajes; 2 endpoints REST; 1 tabla; listas de palabras clave ampliables sin cambiar la lógica de clasificación (FR-014)
 
@@ -44,21 +46,21 @@ Windows.
 
 | # | Principio (constitución) | Estado | Evidencia en el diseño |
 |---|--------------------------|--------|------------------------|
-| I | Simplicidad y Legibilidad (NO NEGOCIABLE) | PASS | Express + zod + una capa de servicio y una de repositorio; sin abstracciones prematuras ni patrones innecesarios; nombres de dominio en español coherentes con el spec |
-| II | Cobertura de Tests Automatizados (NO NEGOCIABLE) | PASS | vitest cubre validación, clasificación, duplicados, orden del historial y endpoints (supertest); repositorio mockeado para correr sin BD; los tests se entregan junto al código |
-| III | Validación de Entrada | PASS | `zod` valida body y query en la capa de entrada, una sola vez; dato inválido → rechazo con mensaje claro (400) sin persistir nada |
-| IV | Credenciales en Variables de Entorno (NO NEGOCIABLE) | PASS | Claves de Supabase solo en `.env` (git-ignored) con `.env.example` sin valores; el arranque falla con mensaje claro si falta alguna variable |
-| V | Manejo de Errores con Códigos HTTP Correctos | PASS | 400 entrada inválida (zod), 409 duplicado, 422 regla semántica si aplica, 500 error interno con detalle solo en servidor; mensajes claros sin stack traces |
-| VI | Documentación y Comentarios en Español | PASS | README en español con pasos para Windows, comentarios en español que expliquen el porqué |
-| VII | Solo Datos Ficticios en Pruebas (NO NEGOCIABLE) | PASS | DNIs/teléfonos de prueba ficticios y deterministas; `supabase-js` mockeado; cero datos reales |
+| I | Simplicidad y Legibilidad (NO NEGOCIABLE) | PASS | FastAPI + Pydantic + capas finas (rutas → servicio → repositorio); un solo paquete `app/`; sin ORM (cliente `supabase-py` plano tras un Protocolo de repositorio); nombres de dominio en español coherentes con el spec |
+| II | Cobertura de Tests Automatizados (NO NEGOCIABLE) | PASS | pytest cubre validación, clasificación, duplicados, orden del historial y endpoints (TestClient); repositorio falso en memoria para correr sin BD; CI con `uv run pytest` en cada push/PR; los tests se entregan junto al código |
+| III | Validación de Entrada | PASS | Pydantic valida body y query en la capa de entrada, una sola vez; dato inválido → rechazo con mensaje claro (400) sin persistir nada |
+| IV | Credenciales en Variables de Entorno (NO NEGOCIABLE) | PASS | Claves de Supabase solo en `.env` (git-ignored) con `.env.example` sin valores; pydantic-settings valida las variables y el arranque falla con mensaje claro si falta alguna |
+| V | Manejo de Errores con Códigos HTTP Correctos | PASS | 400 entrada inválida (Pydantic), 409 duplicado, 500 error interno con detalle solo en el servidor; mensajes claros sin stack traces, vía exception handlers de FastAPI |
+| VI | Documentación y Comentarios en Español | PASS | README en español con pasos para Windows (PowerShell), comentarios en español que expliquen el porqué |
+| VII | Solo Datos Ficticios en Pruebas (NO NEGOCIABLE) | PASS | DNIs/teléfonos de prueba ficticios y deterministas (p. ej. `987654321`); repositorio falso en memoria; cero datos reales |
 
 **Gate result**: PASS — sin violaciones; `Complexity Tracking` queda vacío.
 
 **Re-evaluación post-diseño (fase 1)**: PASS — `data-model.md`,
 `contracts/api-mensajes.md` y `quickstart.md` no introducen nuevas piezas
-(comprobado: repositorio plano con una interfaz, sin ORM ni abstracciones;
+(comprobado: repositorio plano con un Protocolo, sin ORM ni abstracciones;
 sin purga de retención — fuera de alcance, decisión pendiente; tests sin
-datos reales).
+datos reales; `db/schema.sql` sin cambios).
 Los gates siguen en PASS y `Complexity Tracking` permanece vacío.
 
 ## Project Structure
@@ -82,40 +84,44 @@ specs/001-registrar-mensajes-chatbot/
 ### Source Code (repository root)
 
 ```text
-src/
-├── index.ts                 # Arranque del servidor (lee env, crea app, escucha)
-├── app.ts                   # Configuración de Express y registro de rutas
-├── config/
-│   └── entorno.ts           # Lectura y validación zod de las variables de .env
-├── errores.ts               # Manejo de errores y mapeo a códigos HTTP
-├── validacion/
-│   └── mensaje-esquema.ts   # Esquemas zod de registro (body) y consulta (query)
-├── clasificacion/
-│   └── palabras-clave.ts    # Listas de palabras clave por categoría y prioridad
-├── servicios/
-│   └── mensajes-servicio.ts # Registrar, consultar historial, clasificar, purgar
-├── repositorios/
-│   └── mensajes-repositorio.ts # Interfaz + implementación supabase-js
-└── rutas/
-    └── mensajes-ruta.ts     # POST /mensajes y GET /mensajes?dni=
+app/
+├── main.py                  # Crea la app FastAPI, registra handlers de error y rutas
+├── config.py                # pydantic-settings: carga y valida .env (falla si falta alguna variable)
+├── errors.py                # AppError + exception handlers de FastAPI (400/409/500)
+├── validation.py            # Modelos Pydantic: registro (body) y consulta (query `dni`)
+├── classification/
+│   └── palabras_clave.py    # Listas de palabras clave por categoría y prioridad (Apéndice A)
+├── services/
+│   └── mensajes_servicio.py # Registrar, consultar historial, clasificar
+├── repositories/
+│   └── mensajes_repositorio.py # Protocolo + implementación supabase-py
+└── routes/
+    └── mensajes_ruta.py     # POST /mensajes y GET /mensajes?dni=
 
 db/
-└── schema.sql               # SQL para crear la tabla en Supabase
+└── schema.sql               # SQL para crear la tabla en Supabase (sin cambios)
 
 tests/
-├── unit/                    # Clasificación, validación, normalización
-├── contract/                # Endpoints con supertest y repositorio mockeado
-└── integration/             # Flujo completo con repositorio falso
+├── unit/                    # Clasificación, modelos Pydantic, normalización
+├── contract/                # Endpoints con TestClient y repositorio falso
+├── integration/             # Flujo completo con repositorio falso
+└── support/
+    └── repositorio_falso.py # Repositorio falso en memoria (inyectado en la app)
 
+pyproject.toml + uv.lock     # Proyecto uv: dependencias, scripts y config de pytest
 .env.example                 # Variables sin valores reales
 README.md                    # Instrucciones en español (Windows)
+.github/workflows/ci.yml     # CI: uv + `uv run pytest` en push/PR
 ```
 
 **Structure Decision**: Proyecto único (web-service) — no hay frontend ni móvil:
-un solo árbol `src/` con capas finas (rutas → validación → servicio →
-repositorio), `db/schema.sql` para el DDL de Supabase y `tests/` dividido en
-unit/contract/integration. Elegimos la estructura de un solo proyecto porque el
-alcance es una API con dos endpoints (constitución I: simplicidad).
+un solo paquete `app/` con capas finas (rutas → validación Pydantic → servicio →
+repositoritorio), `db/schema.sql` para el DDL de Supabase (tal cual) y `tests/`
+dividido en unit/contract/integration con un repositorio falso reutilizable en
+`tests/support/`. La app se construye con una función `crear_app(repositorio=None)`
+para que los tests inyecten el repositorio falso sin tocar la configuración real.
+Gestión con uv (`uv sync`, `uv run ...`); el archivo `uv.lock` se versiona y
+`.venv/` va en `.gitignore` (constitución I: simplicidad).
 
 ## Complexity Tracking
 

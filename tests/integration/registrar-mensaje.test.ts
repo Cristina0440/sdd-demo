@@ -13,7 +13,7 @@ describe("integración: registrar un mensaje", () => {
     const respuesta = await request(app).post("/mensajes").send({
       nombre: "Ana Prueba",
       dni: "12345678",
-      telefono: "612345678",
+      telefono: "987654321",
       texto: "Quiero información del ciclo",
     });
 
@@ -36,7 +36,7 @@ describe("integración: registrar un mensaje", () => {
     const respuesta = await request(app).post("/mensajes").send({
       nombre: "Ana Prueba",
       dni: "123", // inválido: no tiene 8 dígitos
-      telefono: "612345678",
+      telefono: "987654321",
       texto: "Quiero información del ciclo",
     });
 
@@ -51,7 +51,7 @@ describe("integración: registrar un mensaje", () => {
     const cuerpo = {
       nombre: "Ana Prueba",
       dni: "12345678",
-      telefono: "612345678",
+      telefono: "987654321",
       texto: "Quiero información del ciclo",
     };
 
