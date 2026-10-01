@@ -30,7 +30,7 @@ description: "Lista de tareas para la implementación de la feature"
 - [X] T001 Crear `package.json` con los scripts `dev` (tsx watch), `build`, `start` y `test` (vitest) según research D10 en `package.json`
 - [X] T002 Instalar dependencias en un solo paso: `express`, `@supabase/supabase-js`, `zod`, `dotenv` + dev: `typescript`, `tsx`, `vitest`, `supertest`, `@types/node`, `@types/express`, `@types/supertest` en `package.json`
 - [X] T003 [P] Crear la configuración estricta de TypeScript en `tsconfig.json`
-- [X] T004 [P] Configurar vitest (entorno node, patrón `tests/**/*.test.ts`) en `vitest.config.ts`
+- [X] T004 [P] Configurar vitest (entorno node, patrón `tests/**/*.test.ts`) en `vitest.config.mts` (extensión `.mts` — la variante ESM recomendada para evitar el aviso de Vite al cargarlo como CJS)
 - [X] T005 [P] Crear `.env.example` con `SUPABASE_URL=` y `SUPABASE_SERVICE_ROLE_KEY=` (valores vacíos, sin secretos reales) y asegurar que `.env` figure en `.gitignore`
 
 **Punto de control**: El proyecto compila y `npm test` se ejecuta (sin tests aún, en verde).
@@ -43,10 +43,10 @@ description: "Lista de tareas para la implementación de la feature"
 
 **?? CRÍTICO**: No puede empezar ninguna historia de usuario hasta completar esta fase
 
-- [ ] T006 [P] Crear la tabla `mensajes` en `db/schema.sql` con columnas `id uuid PK`, `nombre text`, `dni char(8)`, `telefono char(9)`, `texto text`, `fecha_hora timestamptz`, `clasificacion text`, con los CHECK verbatim de data-model.md — `dni ~ '^[0-9]{8}$'`, `telefono ~ '^[0-9]{9}$'`, `length(btrim(texto)) > 0`, `clasificacion IN ('informacion_ciclo','devolucion','interes_inscripcion','otro')` — e índice `(dni, fecha_hora DESC)` en `db/schema.sql`
-- [ ] T007 [P] Implementar la carga de `.env` y su validación con zod, fallando el arranque con un mensaje claro que indique la variable que falta (`SUPABASE_URL`, `SUPABASE_SERVICE_ROLE_KEY`), en `src/config/entorno.ts`
-- [ ] T008 [P] Implementar `AppError` (código HTTP + mensaje + campo opcional) y el middleware de errores de Express: 400 validación, 409 duplicado, 500 genérico con el detalle solo en el log del servidor, sin stack traces al cliente, en `src/errores.ts`
-- [ ] T009 Crear la app Express (parser de JSON, middleware de errores de T008, sin rutas aún) en `src/app.ts` y el punto de entrada que lee el entorno y escucha en `src/index.ts` (depende de T007, T008)
+- [X] T006 [P] Crear la tabla `mensajes` en `db/schema.sql` con columnas `id uuid PK`, `nombre text`, `dni char(8)`, `telefono char(9)`, `texto text`, `fecha_hora timestamptz`, `clasificacion text`, con los CHECK verbatim de data-model.md — `dni ~ '^[0-9]{8}$'`, `telefono ~ '^[0-9]{9}$'`, `length(btrim(texto)) > 0`, `clasificacion IN ('informacion_ciclo','devolucion','interes_inscripcion','otro')` — e índice `(dni, fecha_hora DESC)` en `db/schema.sql`
+- [X] T007 [P] Implementar la carga de `.env` y su validación con zod, fallando el arranque con un mensaje claro que indique la variable que falta (`SUPABASE_URL`, `SUPABASE_SERVICE_ROLE_KEY`), en `src/config/entorno.ts`
+- [X] T008 [P] Implementar `AppError` (código HTTP + mensaje + campo opcional) y el middleware de errores de Express: 400 validación, 409 duplicado, 500 genérico con el detalle solo en el log del servidor, sin stack traces al cliente, en `src/errores.ts`
+- [X] T009 Crear la app Express (parser de JSON, middleware de errores de T008, sin rutas aún) en `src/app.ts` y el punto de entrada que lee el entorno y escucha en `src/index.ts` (depende de T007, T008)
 
 **Punto de control**: Base lista — las historias de usuario ya pueden empezar en paralelo.
 
