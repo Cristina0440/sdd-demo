@@ -1,0 +1,26 @@
+# Dependencias
+node_modules/
+
+# Compilación
+dist/
+build/
+
+# Entorno (secretos) — nunca versionar, excepto la plantilla
+.env
+.env.*
+!.env.example
+
+# Registros
+*.log
+npm-debug.log*
+
+# Cobertura de tests
+coverage/
+
+# Editores y sistema operativo
+.vscode/
+.idea/
+*.swp
+*.tmp
+.DS_Store
+Thumbs.db

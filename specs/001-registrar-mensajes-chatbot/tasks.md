@@ -27,11 +27,11 @@ description: "Lista de tareas para la implementación de la feature"
 
 **Propósito**: Inicialización del proyecto y estructura básica
 
-- [ ] T001 Crear `package.json` con los scripts `dev` (tsx watch), `build`, `start` y `test` (vitest) según research D10 en `package.json`
-- [ ] T002 Instalar dependencias en un solo paso: `express`, `@supabase/supabase-js`, `zod`, `dotenv` + dev: `typescript`, `tsx`, `vitest`, `supertest`, `@types/node`, `@types/express`, `@types/supertest` en `package.json`
-- [ ] T003 [P] Crear la configuración estricta de TypeScript en `tsconfig.json`
-- [ ] T004 [P] Configurar vitest (entorno node, patrón `tests/**/*.test.ts`) en `vitest.config.ts`
-- [ ] T005 [P] Crear `.env.example` con `SUPABASE_URL=` y `SUPABASE_SERVICE_ROLE_KEY=` (valores vacíos, sin secretos reales) y asegurar que `.env` figure en `.gitignore`
+- [X] T001 Crear `package.json` con los scripts `dev` (tsx watch), `build`, `start` y `test` (vitest) según research D10 en `package.json`
+- [X] T002 Instalar dependencias en un solo paso: `express`, `@supabase/supabase-js`, `zod`, `dotenv` + dev: `typescript`, `tsx`, `vitest`, `supertest`, `@types/node`, `@types/express`, `@types/supertest` en `package.json`
+- [X] T003 [P] Crear la configuración estricta de TypeScript en `tsconfig.json`
+- [X] T004 [P] Configurar vitest (entorno node, patrón `tests/**/*.test.ts`) en `vitest.config.ts`
+- [X] T005 [P] Crear `.env.example` con `SUPABASE_URL=` y `SUPABASE_SERVICE_ROLE_KEY=` (valores vacíos, sin secretos reales) y asegurar que `.env` figure en `.gitignore`
 
 **Punto de control**: El proyecto compila y `npm test` se ejecuta (sin tests aún, en verde).
 
